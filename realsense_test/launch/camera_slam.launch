@@ -1,0 +1,51 @@
+<launch>
+  <!-- Camera resolution and fps are chosen to run on Jetson Nano, IMU config is the default from realsense-viewer -->
+  <arg name="align_depth" default="true"/>
+  <arg name="enable_gyro" default="true"/>
+  <arg name="enable_accel" default="true"/>
+  <arg name="enable_sync" default="true"/>
+  <arg name="initial_reset" default="false"/>
+  <arg name="camera" default="camera"/>
+  <arg name="unite_imu_method" default="linear_interpolation"/>
+  <arg name="camera_px_width"  default="424"/> <!-- page 72 datasheet fps 5, 15, 30, 60, 90, resolution okish-->
+  <arg name="camera_px_height" default="240"/>
+  <arg name="camera_fps"       default="15"/>
+  <arg name="camera_range_min" default="0.6"/>
+  <arg name="camera_range_max" default="6.0"/>
+  <arg name="gyro_freq"        default="200"/> <!-- 100,200 or 200,400 (datasheet)-->
+  <arg name="accel_freq"       default="100"/>
+
+  <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+    <arg name="depth_width"       value="$(arg camera_px_width)"/>
+    <arg name="depth_height"      value="$(arg camera_px_height)"/>
+    <arg name="depth_fps"         value="$(arg camera_fps)"/>
+    <arg name="color_width"       value="$(arg camera_px_width)"/>
+    <arg name="color_height"      value="$(arg camera_px_height)"/>
+    <arg name="color_fps"         value="$(arg camera_fps)"/>
+    <arg name="infra_width"       value="$(arg camera_px_width)"/>
+    <arg name="infra_height"      value="$(arg camera_px_height)"/>
+    <arg name="infra_fps"         value="$(arg camera_fps)"/>
+    <arg name="enable_gyro"       value="true"/>
+    <arg name="enable_accel"      value="true"/>
+    <arg name="gyro_fps"          value="$(arg gyro_freq)"/>
+    <arg name="accel_fps"         value="$(arg accel_freq)"/>
+    <arg name="align_depth"       value="true"/>
+    <arg name="linear_accel_cov"  value="1.0"/>
+    <arg name="enable_sync" value="$(arg enable_sync)"/>
+    <arg name="initial_reset" value="$(arg initial_reset)"/>
+    <arg name="unite_imu_method" value="$(arg unite_imu_method)"/>
+  </include>
+
+  <include file="$(find rtabmap_ros)/launch/rtabmap.launch">
+        <arg name="rtabmap_args" value="--delete_db_on_start" />
+        <arg name="depth_topic" value="/$(arg camera)/aligned_depth_to_color/image_raw"/>
+        <arg name="frame_id" value="$(arg camera)_link"/>
+        <arg name="odom_topic" value="/$(arg camera)/imu"/>
+        <arg name="rgb_topic" value="/$(arg camera)/color/image_raw"/>
+        <arg name="rviz" value="true"/>
+        <arg name="rtabmap_viz" value="false"/>
+        <arg name="camera_info_topic" value="/$(arg camera)/color/camera_info"/>
+  </include>
+</launch>
+
+

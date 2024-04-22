@@ -1,0 +1,725 @@
+<sdf version='1.7'>
+  <model name='m4assembly'>
+    <link name='dummy'>
+      <inertial>
+        <pose>0.00014 -1.3e-05 -0.067235 0 -0 0</pose>
+        <mass>1.054</mass>
+        <inertia>
+          <ixx>0.00066925</ixx>
+          <ixy>-1.7138e-07</ixy>
+          <ixz>8.4179e-07</ixz>
+          <iyy>0.0060916</iyy>
+          <iyz>-5.4732e-08</iyz>
+          <izz>0.006372</izz>
+        </inertia>
+      </inertial>
+      <collision name='dummy_fixed_joint_lump__base_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/col/base_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='dummy_fixed_joint_lump__base_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/base_link.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='front_left_hip_joint' type='revolute'>
+      <pose relative_to='dummy'>0.22099 0.0323 -0.02605 1.5708 -0.006693 1.5708</pose>
+      <parent>dummy</parent>
+      <child>front_left_hip</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>1.571</upper>
+          <effort>10.5</effort>
+          <velocity>1.57</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='front_left_hip'>
+      <pose relative_to='front_left_hip_joint'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0.051089 -0.07137 0.002321 0 -0 0</pose>
+        <mass>0.272061</mass>
+        <inertia>
+          <ixx>0.000498988</ixx>
+          <ixy>0.000115442</ixy>
+          <ixz>-6.41873e-07</ixz>
+          <iyy>9.68475e-05</iyy>
+          <iyz>3.75397e-06</iyz>
+          <izz>0.000565441</izz>
+        </inertia>
+      </inertial>
+      <collision name='front_left_hip_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/col/front_left_hip.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <collision name='front_left_hip_fixed_joint_lump__front_left_leg_collision_1'>
+        <pose>0.0611 -0.006895 0.002514 3.14159 -1.5708 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/col/front_left_leg.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='front_left_hip_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/front_left_hip.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='front_left_hip_fixed_joint_lump__front_left_leg_visual_1'>
+        <pose>0.0611 -0.006895 0.002514 3.14159 -1.5708 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/front_left_leg.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='front_left_blade_joint' type='revolute'>
+      <pose relative_to='front_left_hip'>0.123621 -0.168895 0.002515 1.57079 -1.57079 1.57079</pose>
+      <parent>front_left_hip</parent>
+      <child>front_left_blade</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <effort>200</effort>
+          <velocity>200</velocity>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='front_left_blade'>
+      <pose relative_to='front_left_blade_joint'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>-0 -0 0.006902 0 -0 0</pose>
+        <mass>0.00610283</mass>
+        <inertia>
+          <ixx>4.65427e-06</ixx>
+          <ixy>6.89624e-07</ixy>
+          <ixz>-5.02014e-13</ixz>
+          <iyy>2.62287e-07</iyy>
+          <iyz>-7.87853e-13</iyz>
+          <izz>4.86249e-06</izz>
+        </inertia>
+      </inertial>
+      <collision name='front_left_blade_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/col/front_left_blade.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='front_left_blade_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/front_left_blade.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='front_left_wheel_joint' type='revolute'>
+      <pose relative_to='front_left_hip'>0.073621 -0.168895 0.002515 -1.57079 -1.57079 1.57079</pose>
+      <parent>front_left_hip</parent>
+      <child>front_left_wheel</child>
+      <axis>
+        <xyz>0 0 -1</xyz>
+        <limit>
+          <effort>200</effort>
+          <velocity>200</velocity>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='front_left_wheel'>
+      <pose relative_to='front_left_wheel_joint'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0 -2e-06 -0.028489 0 -0 0</pose>
+        <mass>0.447368</mass>
+        <inertia>
+          <ixx>0.00104262</ixx>
+          <ixy>2.7422e-10</ixy>
+          <ixz>3.5405e-11</ixz>
+          <iyy>0.00104271</iyy>
+          <iyz>-3.25695e-11</iyz>
+          <izz>0.00200352</izz>
+        </inertia>
+      </inertial>
+      <collision name='front_left_wheel_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/col/front_left_wheel.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='front_left_wheel_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/front_left_wheel.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='front_right_hip_joint' type='revolute'>
+      <pose relative_to='dummy'>0.22099 -0.0323 -0.02605 1.5708 -0.004683 -1.5708</pose>
+      <parent>dummy</parent>
+      <child>front_right_hip</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>1.571</upper>
+          <effort>10.5</effort>
+          <velocity>1.57</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='front_right_hip'>
+      <pose relative_to='front_right_hip_joint'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0.051088 -0.071369 -0.001624 0 -0 0</pose>
+        <mass>0.272061</mass>
+        <inertia>
+          <ixx>0.000498953</ixx>
+          <ixy>0.000115441</ixy>
+          <ixz>8.2873e-07</ixz>
+          <iyy>9.68229e-05</iyy>
+          <iyz>-1.74533e-06</iyz>
+          <izz>0.000565429</izz>
+        </inertia>
+      </inertial>
+      <collision name='front_right_hip_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/col/front_right_hip.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <collision name='front_right_hip_fixed_joint_lump__front_right_leg_collision_1'>
+        <pose>0.0611 -0.006895 -0.002164 1.5708 1.5656 -1.5708</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/col/front_right_leg.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='front_right_hip_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/front_right_hip.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='front_right_hip_fixed_joint_lump__front_right_leg_visual_1'>
+        <pose>0.0611 -0.006895 -0.002164 1.5708 1.5656 -1.5708</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/front_right_leg.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='front_right_blade_joint' type='revolute'>
+      <pose relative_to='front_right_hip'>0.126526 -0.168893 -0.001323 1.56911 1.57079 1.56911</pose>
+      <parent>front_right_hip</parent>
+      <child>front_right_blade</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <effort>200</effort>
+          <velocity>200</velocity>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='front_right_blade'>
+      <pose relative_to='front_right_blade_joint'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0 1e-06 0.003996 0 -0 0</pose>
+        <mass>0.0061029</mass>
+        <inertia>
+          <ixx>4.75885e-06</ixx>
+          <ixy>7.08409e-08</ixy>
+          <ixz>-8.4083e-14</ixz>
+          <iyy>1.5765e-07</iyy>
+          <iyz>8.2372e-13</iyz>
+          <izz>4.86243e-06</izz>
+        </inertia>
+      </inertial>
+      <collision name='front_right_blade_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/col/front_right_blade.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='front_right_blade_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/front_right_blade.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='front_right_wheel_joint' type='revolute'>
+      <pose relative_to='front_right_hip'>0.076526 -0.168893 -0.001323 1.56911 1.57079 1.56911</pose>
+      <parent>front_right_hip</parent>
+      <child>front_right_wheel</child>
+      <axis>
+        <xyz>0 0 -1</xyz>
+        <limit>
+          <effort>200</effort>
+          <velocity>200</velocity>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='front_right_wheel'>
+      <pose relative_to='front_right_wheel_joint'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>1e-06 0 0.025584 0 -0 0</pose>
+        <mass>0.447368</mass>
+        <inertia>
+          <ixx>0.00104269</ixx>
+          <ixy>3.91619e-08</ixy>
+          <ixz>3.50659e-11</ixz>
+          <iyy>0.00104264</iyy>
+          <iyz>3.24294e-11</iyz>
+          <izz>0.00200352</izz>
+        </inertia>
+      </inertial>
+      <collision name='front_right_wheel_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/col/front_right_wheel.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='front_right_wheel_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/front_right_wheel.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='rear_left_hip_joint' type='revolute'>
+      <pose relative_to='dummy'>-0.2231 0.0323 -0.02605 1.5708 -0.009901 1.5708</pose>
+      <parent>dummy</parent>
+      <child>rear_left_hip</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>1.571</upper>
+          <effort>10.5</effort>
+          <velocity>1.57</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='rear_left_hip'>
+      <pose relative_to='rear_left_hip_joint'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0.051089 -0.071359 0.001354 0 -0 0</pose>
+        <mass>0.272061</mass>
+        <inertia>
+          <ixx>0.00049885</ixx>
+          <ixy>0.000115435</ixy>
+          <ixz>-5.24473e-07</ixz>
+          <iyy>9.68504e-05</iyy>
+          <iyz>3.75201e-06</iyz>
+          <izz>0.000565305</izz>
+        </inertia>
+      </inertial>
+      <collision name='rear_left_hip_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/col/rear_left_hip.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <collision name='rear_left_hip_fixed_joint_lump__rear_left_leg_collision_1'>
+        <pose>0.0611 -0.006895 -5e-05 1.5708 -1.5526 1.5708</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/col/rear_left_leg.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='rear_left_hip_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/rear_left_hip.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='rear_left_hip_fixed_joint_lump__rear_left_leg_visual_1'>
+        <pose>0.0611 -0.006895 -5e-05 1.5708 -1.5526 1.5708</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/rear_left_leg.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='rear_left_blade_joint' type='revolute'>
+      <pose relative_to='rear_left_hip'>0.12223 -0.168868 0.002898 -1.58288 -1.57077 -1.56861</pose>
+      <parent>rear_left_hip</parent>
+      <child>rear_left_blade</child>
+      <axis>
+        <xyz>0 -0.0099 0.99995</xyz>
+        <limit>
+          <effort>200</effort>
+          <velocity>200</velocity>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='rear_left_blade'>
+      <pose relative_to='rear_left_blade_joint'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>-0 -8.2e-05 0.008295 0 -0 0</pose>
+        <mass>0.00610275</mass>
+        <inertia>
+          <ixx>4.75952e-06</ixx>
+          <ixy>-3.96883e-08</ixy>
+          <ixz>-3.9324e-10</ixz>
+          <iyy>1.57362e-07</iyy>
+          <iyz>-4.65847e-08</iyz>
+          <izz>4.86189e-06</izz>
+        </inertia>
+      </inertial>
+      <collision name='rear_left_blade_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/col/rear_left_blade.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='rear_left_blade_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/rear_left_blade.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='rear_left_wheel_joint' type='revolute'>
+      <pose relative_to='rear_left_hip'>0.07223 -0.168868 0.002898 1.56861 -1.57077 -1.56861</pose>
+      <parent>rear_left_hip</parent>
+      <child>rear_left_wheel</child>
+      <axis>
+        <xyz>0 0 -1</xyz>
+        <limit>
+          <effort>200</effort>
+          <velocity>200</velocity>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='rear_left_wheel'>
+      <pose relative_to='rear_left_wheel_joint'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>-1e-06 0 -0.029883 0 -0 0</pose>
+        <mass>0.447368</mass>
+        <inertia>
+          <ixx>0.00104269</ixx>
+          <ixy>-3.91603e-08</ixy>
+          <ixz>3.60415e-11</ixz>
+          <iyy>0.00104264</iyy>
+          <iyz>-3.26124e-11</iyz>
+          <izz>0.00200352</izz>
+        </inertia>
+      </inertial>
+      <collision name='rear_left_wheel_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/col/rear_left_wheel.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='rear_left_wheel_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/rear_left_wheel.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='rear_right_hip_joint' type='revolute'>
+      <pose relative_to='dummy'>-0.2235 -0.0323 -0.02605 1.5708 -0.003248 -1.5708</pose>
+      <parent>dummy</parent>
+      <child>rear_right_hip</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>1.571</upper>
+          <effort>10.5</effort>
+          <velocity>1.57</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='rear_right_hip'>
+      <pose relative_to='rear_right_hip_joint'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0.051088 -0.07137 -0.000193 0 -0 0</pose>
+        <mass>0.272061</mass>
+        <inertia>
+          <ixx>0.000498988</ixx>
+          <ixy>0.00011544</ixy>
+          <ixz>-6.41862e-07</ixz>
+          <iyy>9.68468e-05</iyy>
+          <iyz>3.75398e-06</iyz>
+          <izz>0.00056544</izz>
+        </inertia>
+      </inertial>
+      <collision name='rear_right_hip_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/col/rear_right_hip.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <collision name='rear_right_hip_fixed_joint_lump__rear_right_leg_collision_1'>
+        <pose>0.0611 -0.006895 0 -3.14159 1.5708 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/col/rear_right_leg.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='rear_right_hip_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/rear_right_hip.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='rear_right_hip_fixed_joint_lump__rear_right_leg_visual_1'>
+        <pose>0.0611 -0.006895 0 -3.14159 1.5708 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/rear_right_leg.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='rear_right_blade_joint' type='revolute'>
+      <pose relative_to='rear_right_hip'>0.12653 -0.168895 -0 -3.14158 1.57079 3.14159</pose>
+      <parent>rear_right_hip</parent>
+      <child>rear_right_blade</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <effort>200</effort>
+          <velocity>200</velocity>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='rear_right_blade'>
+      <pose relative_to='rear_right_blade_joint'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 0.003992 0 -0 0</pose>
+        <mass>0.0061027</mass>
+        <inertia>
+          <ixx>4.75712e-06</ixx>
+          <ixy>-1.12007e-07</ixy>
+          <ixz>2.24624e-13</ixz>
+          <iyy>1.59284e-07</iyy>
+          <iyz>3.54828e-13</iyz>
+          <izz>4.86234e-06</izz>
+        </inertia>
+      </inertial>
+      <collision name='rear_right_blade_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/col/rear_right_blade.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='rear_right_blade_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/rear_right_blade.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='rear_right_wheel_joint' type='revolute'>
+      <pose relative_to='rear_right_hip'>0.07653 -0.168895 -0 -3.14158 1.57079 3.14159</pose>
+      <parent>rear_right_hip</parent>
+      <child>rear_right_wheel</child>
+      <axis>
+        <xyz>0 0 -1</xyz>
+        <limit>
+          <effort>200</effort>
+          <velocity>200</velocity>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='rear_right_wheel'>
+      <pose relative_to='rear_right_wheel_joint'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>-0 -2e-06 0.02558 0 -0 0</pose>
+        <mass>0.447368</mass>
+        <inertia>
+          <ixx>0.00104262</ixx>
+          <ixy>-2.73562e-10</ixy>
+          <ixz>3.48031e-11</ixz>
+          <iyy>0.00104271</iyy>
+          <iyz>3.22929e-11</iyz>
+          <izz>0.00200352</izz>
+        </inertia>
+      </inertial>
+      <collision name='rear_right_wheel_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/col/rear_right_wheel.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='rear_right_wheel_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://m4assembly/meshes/rear_right_wheel.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <static>0</static>
+    <plugin name='gazebo_ros_control' filename='libgazebo_ros_control.so'>
+      <robotNamespace>/m4assembly</robotNamespace>
+    </plugin>
+  </model>
+</sdf>
+

@@ -1,0 +1,98 @@
+<launch>
+  <param
+    name="robot_description"
+    textfile="$(find m4assembly)/urdf/m4assembly.urdf" />
+
+  <!-- launch gazebo simulation with empty world -->
+  <!-- <include file="$(find gazebo_ros)/launch/empty_world.launch">
+  </include> -->
+  
+  <!-- launch gazebo simulation with a defined world  -->
+  <arg name="gui" default="true"/>
+  <arg name="world_name" default="terrain_1"/>
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find gazebo_uneven_terrain)/worlds/$(arg world_name).world"/>
+    <arg name="gui" value="$(arg gui)"/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>
+
+  <!-- launch keyboard controller -->
+  <node name="key_controller_node" pkg="m4assembly" type="key_controller.py" output="screen"/>
+  
+  <!-- initialize transforms -->
+  <node
+    name="tf_footprint_base"
+    pkg="tf"
+    type="static_transform_publisher"
+    args="0 0 0.28 0 0 0 base_footprint base_link 100" />
+  
+  <!-- define joints as calibrated in simulation, joint calibration will need to be checked on startup with real robot -->
+  <node
+    name="fake_joint_calibration"
+    pkg="rostopic"
+    type="rostopic"
+    args="pub /calibrated std_msgs/Bool true" />
+
+  <!--spawn robot in gazebo -->
+  <node name="spawn_model" pkg="gazebo_ros" type="spawn_model" 
+  	args="-file $(find simulation_world)/urdf/m4assembly.urdf -urdf -x 0.0 -y 0.0 -z 2.0 -model m4assembly" output="screen" />
+
+  <!-- load the controllers -->
+  <rosparam file="$(find simulation_world)/config/controller_config.yaml" command="load"/>
+  <node 
+    name="controller_spawner" 
+    pkg ="controller_manager" 
+    type="spawner"
+    ns="/m4assembly"  
+    args="wheel_velocity_controller 
+          rear_left_hip_position_controller 
+          rear_right_hip_position_controller
+          front_left_hip_position_controller 
+          front_right_hip_position_controller 
+          blade1_position_controller
+          blade2_position_controller
+          blade3_position_controller
+          blade4_position_controller  
+          joint_state_controller "/>
+            
+  <!-- converts joint states to TF transforms -->
+  <node pkg="robot_state_publisher" type="robot_state_publisher"  name="robot_state_publisher">
+    <remap from="/joint_states" to="/m4assembly/joint_states" />
+  </node>
+
+  <!-- Arguments -->
+
+  <arg name="open_rviz"  default="true"/>
+  <arg name="localization" default="true"/>
+  <arg name="database_path" default="~/.ros/rtabmap.db"/>
+  <arg     if="$(arg localization)" name="rtabmap_args" default=""/>
+  <arg unless="$(arg localization)" name="rtabmap_args" default="-d"/>
+  <arg name="camera" default="realsense"/>
+  <arg name="frame_id" default="base_footprint"/>
+
+  <include file="$(find rtabmap_ros)/launch/rtabmap.launch">
+        <arg name="frame_id" value="$(arg frame_id)"/>
+        <arg name="rtabmap_args" value="--delete_db_on_start"/>
+        <arg name="camera_info_topic" value="/$(arg camera)/color/camera_info"/>
+        <arg name="depth_camera_info_topic" value="/$(arg camera)/depth/camera_info"/>
+        <arg name="rgb_topic" value="/$(arg camera)/color/image_raw"/>
+        <arg name="depth_topic" value="/$(arg camera)/depth/image_rect_raw"/>
+        <!-- <arg name="odom_topic" value="/$(arg camera)/imu"/> -->
+        <arg name="rviz" value="true"/>
+        <arg name="rtabmap_viz" value="false"/>
+  </include>
+
+  <!-- <node
+    name="rviz"
+    pkg="rviz"
+    type="rviz"
+    args="-d $(find m4assembly)/rviz/m4_visual.rviz" /> -->
+    <!-- rviz -->
+
+ 
+     
+</launch>
+

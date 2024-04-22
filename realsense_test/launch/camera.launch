@@ -1,0 +1,20 @@
+<launch>
+  <arg name="align_depth" default="true"/>
+  <arg name="enable_gyro" default="true"/>
+  <arg name="enable_accel" default="true"/>
+  <arg name="enable_sync" default="true"/>
+  <arg name="initial_reset" default="true"/>
+  <arg name="camera" default="camera"/>
+  <arg name="unite_imu_method" default="linear_interpolation"/>
+
+  <include file="$(find realsense2_camera)/launch/rs_camera.launch" args="--delete_db_on_start">
+    <arg name="align_depth" value="$(arg align_depth)"/>
+    <arg name="enable_gyro" value="$(arg enable_gyro)"/>
+    <arg name="enable_accel" value="$(arg enable_accel)"/>
+    <arg name="enable_sync" value="$(arg enable_sync)"/>
+    <arg name="initial_reset" value="$(arg initial_reset)"/>
+    <arg name="unite_imu_method" value="$(arg unite_imu_method)"/>
+  </include>
+</launch>
+
+

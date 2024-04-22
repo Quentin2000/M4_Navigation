@@ -1,0 +1,1350 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<robot name="m4assembly">
+  <joint name="m4/ground_truth/odometry_sensorgt_joint" type="revolute">
+    <parent link="base_link"/>
+    <child link="m4/ground_truth/odometry_sensorgt_link"/>
+    <origin xyz="0      0      0.19492" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="0.0" upper="0.0" effort="0.0" velocity="0.0"/>
+  </joint>
+  <joint name="m4/imu_joint" type="revolute">
+    <parent link="base_link"/>
+    <child link="m4/imu_link"/>
+    <origin xyz="0      0      0.19492" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="0.0" upper="0.0" effort="0.0" velocity="0.0"/>
+  </joint>
+  <link name="m4/ground_truth/odometry_sensorgt_link">
+    <inertial>
+      <mass value="0.001"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0002" iyz="0" izz="0.0002"/>
+    </inertial>
+  </link>
+  <link name="m4/imu_link">
+   <inertial>
+      <mass value="0.001"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.00001" ixy="0" ixz="0" iyy="0.00002" iyz="0" izz="0.00002"/>
+   </inertial>
+  </link>
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="0.00014012 -1.2866E-05 -0.067235"
+        rpy="0 0 0" />
+      <mass
+        value="1.054" />
+      <inertia
+        ixx="0.00066925"
+        ixy="-1.7138E-07"
+        ixz="8.4179E-07"
+        iyy="0.0060916"
+        iyz="-5.4732E-08"
+        izz="0.006372" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/col/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="rear_left_hip">
+    <inertial>
+      <origin
+        xyz="0.032048263261567 0.00148857273521091 0.000801285389170403"
+        rpy="0 0 0" />
+      <mass
+        value="0.0631744337027232" />
+      <inertia
+        ixx="1.00187470871694E-05"
+        ixy="1.26346518144828E-06"
+        ixz="-1.71088892144535E-13"
+        iyy="1.47423630145446E-05"
+        iyz="-3.33426314544602E-14"
+        izz="2.18314090226691E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/rear_left_hip.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/col/rear_left_hip.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rear_left_hip_joint"
+    type="revolute">
+    <origin
+      xyz="-0.2231 0.0323 -0.02605"
+      rpy="1.5708 0 1.5708" />
+    <parent
+      link="base_link" />
+    <child
+      link="rear_left_hip" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="0"
+      upper="1.5708"
+      effort="10000"
+      velocity="1.57" />
+  </joint>
+  <link
+    name="rear_left_leg">
+    <inertial>
+      <origin
+        xyz="-3.41455978458693E-06 0.0865094820933296 -0.00425258484840052"
+        rpy="0 0 0" />
+      <mass
+        value="0.208886814057311" />
+      <inertia
+        ixx="7.70084638154863E-05"
+        ixy="9.13752456418355E-09"
+        ixz="3.41558069671286E-07"
+        iyy="5.22430908180149E-05"
+        iyz="-3.49227338347394E-08"
+        izz="5.21652155907927E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/rear_left_leg.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/col/rear_left_leg.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rear_left_leg_joint"
+    type="fixed">
+    <origin
+      xyz="0.0611 -0.006895 -5E-05"
+      rpy="1.5708 -1.5526 1.5708" />
+    <parent
+      link="rear_left_hip" />
+    <child
+      link="rear_left_leg" />
+    <axis
+      xyz="0 0 -1" />
+  </joint>
+  <link
+    name="rear_left_wheel">
+    <inertial>
+      <origin
+        xyz="-1.2835011736767E-06 2.34490590667047E-07 -0.0298825868697071"
+        rpy="0 0 0" />
+      <mass
+        value="0.447367748033206" />
+      <inertia
+        ixx="0.00104268899323013"
+        ixy="-3.91603340525233E-08"
+        ixz="3.60415118706037E-11"
+        iyy="0.00104263881447407"
+        iyz="-3.26123864995785E-11"
+        izz="0.00200352361648073" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/rear_left_wheel.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/col/rear_left_wheel.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rear_left_wheel_joint"
+    type="continuous">
+    <origin
+      xyz="0 0.162 0.011129"
+      rpy="-3.1416 0 0.018227" />
+    <parent
+      link="rear_left_leg" />
+    <child
+      link="rear_left_wheel" />
+    <axis
+      xyz="0 0 -1" />
+    <limit
+      effort="200"
+      velocity="200" />
+  </joint>
+  <link
+    name="rear_left_blade">
+    <inertial>
+      <origin
+        xyz="0 0 0.0082946342231609"
+        rpy="0 0 0" />
+      <mass
+        value="0.00610274937825579" />
+      <inertia ixx="9.75e-06" ixy="0" ixz="0" iyy="0.000166704" iyz="0" izz="0.000167604"/>
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/rear_left_blade.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.1" length="0.005"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rear_left_blade_joint"
+    type="revolute">
+    <origin
+      xyz="0 0.162 0.061129"
+      rpy="-0.0099006 0 0.018227" />
+    <parent
+      link="rear_left_leg" />
+    <child
+      link="rear_left_blade" />
+    <axis
+      xyz="0 -0.0099004 0.99995" />
+    <limit lower="-1e+16" upper="1e+16" effort="10000" velocity="10000"/>
+  </joint>
+  <link
+    name="rear_right_hip">
+    <inertial>
+      <origin
+        xyz="0.0320482634870919 0.00148857274187802 -0.000820989548367512"
+        rpy="0 0 0" />
+      <mass
+        value="0.0631744341018766" />
+      <inertia
+        ixx="1.00187470810585E-05"
+        ixy="1.26346518895748E-06"
+        ixz="-1.58209935155058E-13"
+        iyy="1.47423629783338E-05"
+        iyz="-2.99342928986296E-14"
+        izz="2.18314089935792E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/rear_right_hip.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/col/rear_right_hip.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rear_right_hip_joint"
+    type="revolute">
+    <origin
+      xyz="-0.2235 -0.0323 -0.02605"
+      rpy="1.5708 0 -1.5708" />
+    <parent
+      link="base_link" />
+    <child
+      link="rear_right_hip" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="0"
+      upper="1.5708"
+      effort="10000"
+      velocity="1.57" />
+  </joint>
+  <link
+    name="rear_right_leg">
+    <inertial>
+      <origin
+        xyz="3.41455156416259E-06 0.0865094821571721 0.00425258483326613"
+        rpy="0 0 0" />
+      <mass
+        value="0.208886814304404" />
+      <inertia
+        ixx="7.70084638389827E-05"
+        ixy="-9.13752631729426E-09"
+        ixz="3.41558058672973E-07"
+        iyy="5.22430908411789E-05"
+        iyz="3.49227166953638E-08"
+        izz="5.21652156031499E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/rear_right_leg.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/col/rear_right_leg.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rear_right_leg_joint"
+    type="fixed">
+    <origin
+      xyz="0.0611 -0.006895 0"
+      rpy="3.1416 1.5708 0" />
+    <parent
+      link="rear_right_hip" />
+    <child
+      link="rear_right_leg" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="rear_right_wheel">
+    <inertial>
+      <origin
+        xyz="-1.78659846361562E-08 -2.01874887645337E-06 0.0255799203790625"
+        rpy="0 0 0" />
+      <mass
+        value="0.447367750743676" />
+      <inertia
+        ixx="0.0010426206896193"
+        ixy="-2.73561891555305E-10"
+        ixz="3.48030847023143E-11"
+        iyy="0.00104270712224184"
+        iyz="3.22928670574781E-11"
+        izz="0.00200352362095162" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/rear_right_wheel.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/col/rear_right_wheel.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rear_right_wheel_joint"
+    type="continuous">
+    <origin
+      xyz="0 0.162 -0.015431"
+      rpy="3.1416 0 0" />
+    <parent
+      link="rear_right_leg" />
+    <child
+      link="rear_right_wheel" />
+    <axis
+      xyz="0 0 -1" />
+    <limit
+      effort="200"
+      velocity="200" />
+  </joint>
+  <link
+    name="rear_right_blade">
+    <inertial>
+      <origin
+        xyz="0 0 0.00399237045178649"
+        rpy="0 0 0" />
+      <mass
+        value="0.00610270077025495" />
+      <inertia ixx="9.75e-06" ixy="0" ixz="0" iyy="0.000166704" iyz="0" izz="0.000167604"/>
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/rear_right_blade.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/col/rear_right_blade.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rear_right_blade_joint"
+    type="revolute">
+    <origin
+      xyz="0 0.162 -0.065431"
+      rpy="3.1416 0 0" />
+    <parent
+      link="rear_right_leg" />
+    <child
+      link="rear_right_blade" />
+    <axis
+      xyz="0 0 1" />
+    <limit lower="-1e+16" upper="1e+16" effort="10000" velocity="10000"/>  
+  </joint>
+  <link
+    name="front_left_hip">
+    <inertial>
+      <origin
+        xyz="0.0320482633471696 0.00148857273674285 0.00169341200883941"
+        rpy="0 0 0" />
+      <mass
+        value="0.0631744338743183" />
+      <inertia
+        ixx="1.00187470896772E-05"
+        ixy="1.26346518496343E-06"
+        ixz="-1.75127210359815E-13"
+        iyy="1.474236301921E-05"
+        iyz="-3.22758580937248E-14"
+        izz="2.18314090243211E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/front_left_hip.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/col/front_left_hip.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="front_left_hip_joint"
+    type="revolute">
+    <origin
+      xyz="0.22099 0.0323 -0.02605"
+      rpy="1.5708 0 1.5708" />
+    <parent
+      link="base_link" />
+    <child
+      link="front_left_hip" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="0"
+      upper="1.5708"
+      effort="10000"
+      velocity="1.57" />
+  </joint>
+  <link
+    name="front_left_leg">
+    <inertial>
+      <origin
+        xyz="-3.41455576607095E-06 0.0865094821265606 -0.00425258483916741"
+        rpy="0 0 0" />
+      <mass
+        value="0.208886814202469" />
+      <inertia
+        ixx="7.70084638282559E-05"
+        ixy="9.13752541336675E-09"
+        ixz="3.41558064254658E-07"
+        iyy="5.22430908306995E-05"
+        iyz="-3.49227240782923E-08"
+        izz="5.21652155975951E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/front_left_leg.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/col/front_left_leg.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="front_left_leg_joint"
+    type="fixed">
+    <origin
+      xyz="0.0611 -0.006895 0.0025144"
+      rpy="-1.5708 -1.5708 -1.5708" />
+    <parent
+      link="front_left_hip" />
+    <child
+      link="front_left_leg" />
+    <axis
+      xyz="0 0 -1" />
+  </joint>
+  <link
+    name="front_left_wheel">
+    <inertial>
+      <origin
+        xyz="1.77235233511999E-08 -2.01879895370127E-06 -0.0284894545323338"
+        rpy="0 0 0" />
+      <mass
+        value="0.447367750292981" />
+      <inertia
+        ixx="0.00104262069065618"
+        ixy="2.74220212176939E-10"
+        ixz="3.54050122778484E-11"
+        iyy="0.00104270712119543"
+        iyz="-3.25695335683767E-11"
+        izz="0.00200352362063109" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/front_left_wheel.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/col/front_left_wheel.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="front_left_wheel_joint"
+    type="continuous">
+    <origin
+      xyz="0 0.162 0.012522"
+      rpy="3.1416 0 0" />
+    <parent
+      link="front_left_leg" />
+    <child
+      link="front_left_wheel" />
+    <axis
+      xyz="0 0 -1" />
+    <limit
+      effort="200"
+      velocity="200" />
+  </joint>
+  <link
+    name="front_left_blade">
+    <inertial>
+      <origin
+        xyz="0 0 0.0069019562259629"
+        rpy="0 0 0" />
+      <mass
+        value="0.0061028301426362" />
+      <inertia ixx="9.75e-06" ixy="0" ixz="0" iyy="0.000166704" iyz="0" izz="0.000167604"/>
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/front_left_blade.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/col/front_left_blade.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="front_left_blade_joint"
+    type="revolute">
+    <origin
+      xyz="0 0.162 0.062522"
+      rpy="0 0 0" />
+    <parent
+      link="front_left_leg" />
+    <child
+      link="front_left_blade" />
+    <axis
+      xyz="0 0 1" />
+    <limit lower="-1e+16" upper="1e+16" effort="10000" velocity="10000"/>
+  </joint>
+  <link
+    name="front_right_hip">
+    <inertial>
+      <origin
+        xyz="0.0320482634665248 0.0014885727412563 -0.00131311618414334"
+        rpy="0 0 0" />
+      <mass
+        value="0.0631744340641276" />
+      <inertia
+        ixx="1.00187470815544E-05"
+        ixy="1.26346518823477E-06"
+        ixz="-1.57692513882067E-13"
+        iyy="1.47423629788781E-05"
+        iyz="-2.96148209881054E-14"
+        izz="2.18314089943886E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/front_right_hip.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/col/front_right_hip.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="front_right_hip_joint"
+    type="revolute">
+    <origin
+      xyz="0.22099 -0.0323 -0.02605"
+      rpy="1.5708 0 -1.5708" />
+    <parent
+      link="base_link" />
+    <child
+      link="front_right_hip" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="0"
+      upper="1.5708"
+      effort="10000"
+      velocity="1.57" />
+  </joint>
+  <link
+    name="front_right_leg">
+    <inertial>
+      <origin
+        xyz="3.41455365766163E-06 0.0865094821436897 0.00425258483703411"
+        rpy="0 0 0" />
+      <mass
+        value="0.208886814244098" />
+      <inertia
+        ixx="7.70084638339796E-05"
+        ixy="-9.13752605384622E-09"
+        ixz="3.4155806167583E-07"
+        iyy="5.2243090836002E-05"
+        iyz="3.49227209398553E-08"
+        izz="5.21652156003534E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/front_right_leg.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/col/front_right_leg.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="front_right_leg_joint"
+    type="fixed">
+    <origin
+      xyz="0.0611 -0.006895 -0.0021644"
+      rpy="1.5708 1.5656 -1.5708" />
+    <parent
+      link="front_right_hip" />
+    <child
+      link="front_right_leg" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-0.5"
+      upper="0.5"
+      effort="10.5"
+      velocity="1.57" />
+  </joint>
+  <link
+    name="front_right_wheel">
+    <inertial>
+      <origin
+        xyz="1.28310223720821E-06 2.3448596928044E-07 0.0255837574129385"
+        rpy="0 0 0" />
+      <mass
+        value="0.447367750640603" />
+      <inertia
+        ixx="0.00104268899474349"
+        ixy="3.91619025865096E-08"
+        ixz="3.50659148166867E-11"
+        iyy="0.00104263881744075"
+        iyz="3.24293757397963E-11"
+        izz="0.00200352362110246" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/front_right_wheel.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/col/front_right_wheel.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="front_right_wheel_joint"
+    type="continuous">
+    <origin
+      xyz="0 0.162 -0.015427"
+      rpy="-3.1416 0 -0.0052077" />
+    <parent
+      link="front_right_leg" />
+    <child
+      link="front_right_wheel" />
+    <axis
+      xyz="0 0 -1" />
+    <limit
+      effort="200"
+      velocity="200" />
+  </joint>
+  <link
+    name="front_right_blade">
+    <inertial>
+      <origin
+        xyz="0 0 0.0039962219905107"
+        rpy="0 0 0" />
+      <mass
+        value="0.00610290216434297" />
+      <inertia ixx="9.75e-06" ixy="0" ixz="0" iyy="0.000166704" iyz="0" izz="0.000167604"/>
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/front_right_blade.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://m4assembly/meshes/col/front_right_blade.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="front_right_blade_joint"
+    type="revolute">
+    <origin
+      xyz="0 0.162 -0.065427"
+      rpy="-3.1416 0 -0.0052077" />
+    <parent
+      link="front_right_leg" />
+    <child
+      link="front_right_blade" />
+    <axis
+      xyz="0 0 1" />
+    <limit lower="-1e+16" upper="1e+16" effort="10000" velocity="10000"/>
+  </joint>
+
+    <link name="front_realsense" />
+
+  <!--
+    The gazebo plugin aligns the depth data with the Z axis, with X=left and Y=up
+    ROS expects the depth data along the X axis, with Y=left and Z=up
+    This link only exists to give the gazebo plugin the correctly-oriented frame
+  -->
+  <link name="front_realsense_gazebo" />
+  <joint name="front_realsense_gazebo_joint" type="fixed">
+    <parent link="front_realsense"/>
+    <child link="front_realsense_gazebo"/>
+    <origin xyz="0.0 0 0" rpy="-1.5707963267948966 0 -1.5707963267948966"/>
+  </joint>
+
+  <gazebo reference="front_realsense">
+    <turnGravityOff>true</turnGravityOff>
+    <sensor type="depth" name="front_realsense_depth">
+      <update_rate>30</update_rate>
+      <camera>
+        <!-- 75x65 degree FOV for the depth sensor -->
+        <horizontal_fov>1.5184351666666667</horizontal_fov>
+        <vertical_fov>1.0122901111111111</vertical_fov>
+
+        <image>
+          <width>640</width>
+          <height>480</height>
+          <format>RGB8</format>
+        </image>
+        <clip>
+          <!-- give the color sensor a maximum range of 50m so that the simulation renders nicely -->
+          <near>0.01</near>
+          <far>50.0</far>
+        </clip>
+      </camera>
+      <plugin name="kinect_controller" filename="libgazebo_ros_openni_kinect.so">
+        <baseline>0.2</baseline>
+        <alwaysOn>true</alwaysOn>
+        <updateRate>30</updateRate>
+        <cameraName>realsense</cameraName>
+        <imageTopicName>color/image_raw</imageTopicName>
+        <cameraInfoTopicName>color/camera_info</cameraInfoTopicName>
+        <depthImageTopicName>depth/image_rect_raw</depthImageTopicName>
+        <depthImageInfoTopicName>depth/camera_info</depthImageInfoTopicName>
+        <pointCloudTopicName>depth/color/points</pointCloudTopicName>
+        <frameName>front_realsense_gazebo</frameName>
+        <pointCloudCutoff>0.105</pointCloudCutoff>
+        <pointCloudCutoffMax>8.0</pointCloudCutoffMax>
+        <distortionK1>0.00000001</distortionK1>
+        <distortionK2>0.00000001</distortionK2>
+        <distortionK3>0.00000001</distortionK3>
+        <distortionT1>0.00000001</distortionT1>
+        <distortionT2>0.00000001</distortionT2>
+        <CxPrime>0</CxPrime>
+        <Cx>0</Cx>
+        <Cy>0</Cy>
+        <focalLength>0</focalLength>
+        <hackBaseline>0</hackBaseline>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+  <link name="front_realsense_lens">
+    <visual>
+      <origin xyz="0.02 0 0" rpy="1.5707963267948966 0 1.5707963267948966" />
+      <geometry>
+        <mesh filename="package://realsense2_description/meshes/d435.dae" />
+      </geometry>
+      <material name="white" />
+    </visual>
+  </link>
+
+  <joint type="fixed" name="front_realsense_lens_joint">
+    <!-- Offset the camera 2cm backwards and 1cm up -->
+    <origin xyz="0.24099 0 0" rpy="0 0 0" />
+    <parent link="base_link" />
+    <child link="front_realsense_lens" />
+  </joint>
+  <joint type="fixed" name="front_realsense_joint">
+    <origin xyz="0.025 0 0" rpy="0 0 0" />
+    <parent link="front_realsense_lens" />
+    <child link="front_realsense" />
+  </joint>
+
+<!-- ROS Control plugin for Gazebo -->
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/m4assembly</robotNamespace>
+    </plugin>
+  </gazebo>
+
+  <!-- transmission -->
+  <transmission name="rl_hip_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <actuator name="motor1">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+    <joint name="rear_left_hip_joint">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+  </transmission>
+
+  <transmission name="rl_wheel_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <actuator name="motor3">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+    <joint name="rear_left_wheel_joint">
+      <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+    </joint>
+  </transmission>
+
+  <transmission name="rr_hip_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <actuator name="motor5">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+    <joint name="rear_right_hip_joint">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+  </transmission>
+
+  <transmission name="rr_wheel_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <actuator name="motor7">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+    <joint name="rear_right_wheel_joint">
+      <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+    </joint>
+  </transmission>
+
+  <transmission name="fl_hip_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <actuator name="motor9">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+    <joint name="front_left_hip_joint">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+  </transmission>
+
+  <transmission name="fl_wheel_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <actuator name="motor11">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+    <joint name="front_left_wheel_joint">
+      <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+    </joint>
+  </transmission>
+
+  <transmission name="fr_hip_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <actuator name="motor13">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+    <joint name="front_right_hip_joint">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+  </transmission>
+
+  <transmission name="fr_wheel_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <actuator name="motor12">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+    <joint name="front_right_wheel_joint">
+      <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+    </joint>
+  </transmission>
+  
+
+  <gazebo reference="m4/imu_link">
+    <gravity>true</gravity>
+    <sensor name="imu_sensor" type="imu">
+      <always_on>true</always_on>
+      <update_rate>1000</update_rate>
+      <visualize>true</visualize>
+      <topic>__default_topic__</topic>
+      <plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
+        <topicName>imu_link</topicName>
+        <bodyName>m4/imu_link</bodyName>
+        <updateRateHZ>10.0</updateRateHZ>
+        <gaussianNoise>0.0</gaussianNoise>
+        <xyzOffset>0 0 0</xyzOffset>
+        <rpyOffset>0 0 0</rpyOffset>
+        <frameName>imu_link</frameName>
+        <initialOrientationAsReference>false</initialOrientationAsReference>
+      </plugin>
+      <pose>0 0 0 3.141593 0 0</pose>
+    </sensor>
+  </gazebo>
+  <gazebo>
+    <plugin name="p3d_base_controller" filename="libgazebo_ros_p3d.so">
+      <alwaysOn>true</alwaysOn>
+      <updateRate>50.0</updateRate>
+      <bodyName>base_link</bodyName>
+      <topicName>ground_truth/state</topicName>
+      <gaussianNoise>0.01</gaussianNoise>
+      <frameName>world</frameName>
+      <xyzOffsets>0 0 0</xyzOffsets>
+      <rpyOffsets>0 0 0</rpyOffsets>
+    </plugin>
+    <plugin name="rotor_0_blade_1" filename="libLiftDragPlugin.so">
+      <a0>0.3</a0>
+      <alpha_stall>1.4</alpha_stall>
+      <cla>4.2500</cla>
+      <cda>0.10</cda>
+      <cma>0.00</cma>
+      <cla_stall>-0.025</cla_stall>
+      <cda_stall>0.0</cda_stall>
+      <cma_stall>0.0</cma_stall>
+      <area>0.002</area>
+      <air_density>1.2041</air_density>
+      <cp>0.084 0 0</cp>
+      <forward>0 1 0</forward>
+      <upward>0 0 1</upward>
+      <link_name>front_right_blade</link_name>
+    </plugin>
+    <plugin name="rotor_0_blade_2" filename="libLiftDragPlugin.so">
+      <a0>0.3</a0>
+      <alpha_stall>1.4</alpha_stall>
+      <cla>4.2500</cla>
+      <cda>0.10</cda>
+      <cma>0.00</cma>
+      <cla_stall>-0.025</cla_stall>
+      <cda_stall>0.0</cda_stall>
+      <cma_stall>0.0</cma_stall>
+      <area>0.002</area>
+      <air_density>1.2041</air_density>
+      <cp>-0.084 0 0</cp>
+      <forward>0 -1 0</forward>
+      <upward>0 0 1</upward>
+      <link_name>front_right_blade</link_name>
+    </plugin>
+
+    <plugin name="rotor_1_blade_1" filename="libLiftDragPlugin.so">
+      <a0>0.3</a0>
+      <alpha_stall>1.4</alpha_stall>
+      <cla>4.2500</cla>
+      <cda>0.10</cda>
+      <cma>0.00</cma>
+      <cla_stall>-0.025</cla_stall>
+      <cda_stall>0.0</cda_stall>
+      <cma_stall>0.0</cma_stall>
+      <area>0.002</area>
+      <air_density>1.2041</air_density>
+      <cp>0.084 0 0</cp>
+      <forward>0 1 0</forward>
+      <upward>0 0 1</upward>
+      <link_name>rear_left_blade</link_name>
+    </plugin>
+    <plugin name="rotor_1_blade_2" filename="libLiftDragPlugin.so">
+      <a0>0.3</a0>
+      <alpha_stall>1.4</alpha_stall>
+      <cla>4.2500</cla>
+      <cda>0.10</cda>
+      <cma>0.00</cma>
+      <cla_stall>-0.025</cla_stall>
+      <cda_stall>0.0</cda_stall>
+      <cma_stall>0.0</cma_stall>
+      <area>0.002</area>
+      <air_density>1.2041</air_density>
+      <cp>-0.084 0 0</cp>
+      <forward>0 -1 0</forward>
+      <upward>0 0 1</upward>
+      <link_name>rear_left_blade</link_name>
+    </plugin>
+
+    <plugin name="rotor_2_blade_1" filename="libLiftDragPlugin.so">
+      <a0>0.3</a0>
+      <alpha_stall>1.4</alpha_stall>
+      <cla>4.2500</cla>
+      <cda>0.10</cda>
+      <cma>0.00</cma>
+      <cla_stall>-0.025</cla_stall>
+      <cda_stall>0.0</cda_stall>
+      <cma_stall>0.0</cma_stall>
+      <area>0.002</area>
+      <air_density>1.2041</air_density>
+      <cp>0.084 0 0</cp>
+      <forward>0 -1 0</forward>
+      <upward>0 0 1</upward>
+      <link_name>front_left_blade</link_name>
+    </plugin>
+    <plugin name="rotor_2_blade_2" filename="libLiftDragPlugin.so">
+      <a0>0.3</a0>
+      <alpha_stall>1.4</alpha_stall>
+      <cla>4.2500</cla>
+      <cda>0.10</cda>
+      <cma>0.00</cma>
+      <cla_stall>-0.025</cla_stall>
+      <cda_stall>0.0</cda_stall>
+      <cma_stall>0.0</cma_stall>
+      <area>0.002</area>
+      <air_density>1.2041</air_density>
+      <cp>-0.084 0 0</cp>
+      <forward>0 1 0</forward>
+      <upward>0 0 1</upward>
+      <link_name>front_left_blade</link_name>
+    </plugin>
+
+    <plugin name="rotor_3_blade_1" filename="libLiftDragPlugin.so">
+      <a0>0.3</a0>
+      <alpha_stall>1.4</alpha_stall>
+      <cla>4.2500</cla>
+      <cda>0.10</cda>
+      <cma>0.00</cma>
+      <cla_stall>-0.025</cla_stall>
+      <cda_stall>0.0</cda_stall>
+      <cma_stall>0.0</cma_stall>
+      <area>0.002</area>
+      <air_density>1.2041</air_density>
+      <cp>0.084 0 0</cp>
+      <forward>0 -1 0</forward>
+      <upward>0 0 1</upward>
+      <link_name>rear_right_blade</link_name>
+    </plugin>
+    <plugin name="rotor_3_blade_2" filename="libLiftDragPlugin.so">
+      <a0>0.3</a0>
+      <alpha_stall>1.4</alpha_stall>
+      <cla>4.2500</cla>
+      <cda>0.10</cda>
+      <cma>0.00</cma>
+      <cla_stall>-0.025</cla_stall>
+      <cda_stall>0.0</cda_stall>
+      <cma_stall>0.0</cma_stall>
+      <area>0.002</area>
+      <air_density>1.2041</air_density>
+      <cp>-0.084 0 0</cp>
+      <forward>0 1 0</forward>
+      <upward>0 0 1</upward>
+      <link_name>rear_right_blade</link_name>
+    </plugin>
+
+    <plugin name="arducopter_plugin" filename="libArduPilotPlugin.so">
+      <fdm_addr>127.0.0.1</fdm_addr>
+      <fdm_port_in>9002</fdm_port_in>
+      <fdm_port_out>9003</fdm_port_out>
+      <!--
+          Require by APM :
+          Only change model and gazebo from XYZ to XY-Z coordinates
+      -->
+      <modelXYZToAirplaneXForwardZDown>0 0 0 3.141593 0 0</modelXYZToAirplaneXForwardZDown>
+      <gazeboXYZToNED>0 0 0 3.141593 0 0</gazeboXYZToNED>
+      <imuName>m4/imu_link::imu_sensor</imuName>
+      <connectionTimeoutMaxCount>5</connectionTimeoutMaxCount>
+      <control channel="0">
+      <!--
+          incoming control command [0, 1]
+          so offset it by 0 to get [0, 1]
+          and divide max target by 1.
+          offset = 0
+          multiplier = 838 max rpm / 1 = 838
+        -->
+        <type>VELOCITY</type>
+        <offset>0</offset>
+        <p_gain>0.2</p_gain>
+        <i_gain>0</i_gain>
+        <d_gain>0</d_gain>
+        <i_max>0</i_max>
+        <i_min>0</i_min>
+        <cmd_max>2.5</cmd_max>
+        <cmd_min>-2.5</cmd_min>
+        <jointName>front_right_blade_joint</jointName>
+        <multiplier>1898</multiplier>
+        <controlVelocitySlowdownSim>1</controlVelocitySlowdownSim>
+      </control>
+      <control channel="1">
+        <type>VELOCITY</type>
+        <offset>0</offset>
+        <p_gain>0.2</p_gain>
+        <i_gain>0</i_gain>
+        <d_gain>0</d_gain>
+        <i_max>0</i_max>
+        <i_min>0</i_min>
+        <cmd_max>2.5</cmd_max>
+        <cmd_min>-2.5</cmd_min>
+        <jointName>rear_left_blade_joint</jointName>
+        <multiplier>1898</multiplier>
+        <controlVelocitySlowdownSim>1</controlVelocitySlowdownSim>
+      </control>
+      <control channel="2">
+        <type>VELOCITY</type>
+        <offset>0</offset>
+        <p_gain>0.2</p_gain>
+        <i_gain>0</i_gain>
+        <d_gain>0</d_gain>
+        <i_max>0</i_max>
+        <i_min>0</i_min>
+        <cmd_max>2.5</cmd_max>
+        <cmd_min>-2.5</cmd_min>
+        <jointName>front_left_blade_joint</jointName>
+        <multiplier>-1898</multiplier>
+        <controlVelocitySlowdownSim>1</controlVelocitySlowdownSim>
+      </control>
+      <control channel="3">
+        <type>VELOCITY</type>
+        <offset>0</offset>
+        <p_gain>0.2</p_gain>
+        <i_gain>0</i_gain>
+        <d_gain>0</d_gain>
+        <i_max>0</i_max>
+        <i_min>0</i_min>
+        <cmd_max>2.5</cmd_max>
+        <cmd_min>-2.5</cmd_min>
+        <jointName>rear_right_blade_joint</jointName>
+        <multiplier>-1898</multiplier>
+        <controlVelocitySlowdownSim>1</controlVelocitySlowdownSim>
+      </control>
+    </plugin>
+  </gazebo>
+</robot>
+
