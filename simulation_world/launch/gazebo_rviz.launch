@@ -9,9 +9,9 @@
   
   <!-- launch gazebo simulation with a defined world  -->
   <arg name="gui" default="true"/>
-  <arg name="world_name" default="terrain_1"/>
+  <arg name="world_name" default="Cube_2"/>
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="world_name" value="$(find gazebo_uneven_terrain)/worlds/$(arg world_name).world"/>
+    <arg name="world_name" value="$(find simulation_world)/worlds/$(arg world_name).world"/>
     <arg name="gui" value="$(arg gui)"/>
     <arg name="paused" value="false"/>
     <arg name="use_sim_time" value="true"/>
@@ -19,12 +19,15 @@
     <arg name="debug" value="false"/>
   </include>
   
+  <!-- launch keyboard controller -->
+  <node name="key_controller_node" pkg="m4assembly" type="key_controller.py" output="screen"/>
+  
   <!-- initialize transforms -->
   <node
     name="tf_footprint_base"
     pkg="tf"
     type="static_transform_publisher"
-    args="0 0 1.0 0 0 0 base_link map 40" />
+    args="0 0 0.28 0 0 0 base_footprint base_link 100" />
   
   <!-- define joints as calibrated in simulation, joint calibration will need to be checked on startup with real robot -->
   <node
@@ -60,13 +63,17 @@
     <remap from="/joint_states" to="/m4assembly/joint_states" />
   </node>
 
+  <arg name="launch_rviz" default="true" />
+
   <!-- launch rviz -->
+<group if="$(arg launch_rviz)">
   <node
     name="rviz"
     pkg="rviz"
     type="rviz"
     args="-d $(find simulation_world)/rviz/m4_visual.rviz" />
- 
+</group>
+  
      
 </launch>
 

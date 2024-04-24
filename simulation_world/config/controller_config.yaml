@@ -38,7 +38,7 @@ m4assembly:
     rear_left_hip_position_controller:
      type: effort_controllers/JointPositionController
      joint: rear_left_hip_joint
-     publish_rate: 100
+     publish_rate: 50
      pid: {p: 80, i: 7, d: 1}
 
     rear_right_hip_position_controller:
@@ -46,6 +46,7 @@ m4assembly:
      joint: rear_right_hip_joint
      publish_rate: 50
      pid: {p: 80, i: 7, d: 1}
+     
     front_left_hip_position_controller:
      type: effort_controllers/JointPositionController
      joint: front_left_hip_joint
