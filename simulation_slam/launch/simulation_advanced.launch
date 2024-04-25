@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<!-- -->
+<launch>
+
+  <!-- Load Gazebo world -->
+  <include file="$(find simulation_world)/launch/gazebo_rviz.launch">
+    <arg name="launch_rviz" value="false"/>
+    <arg name="world_name"  value="test_0.sdf"/>
+  </include>
+
+   <!-- SLAM arguments -->
+  <arg name="camera"                    default="realsense"/>
+  <arg name="frame_id"                  default="base_footprint"/>
+  <arg name="proj_max_ground_height"    default="0.1"/>
+  <arg name="proj_max_height_default"    default="2.0"/>
+  <arg name="proj_max_height_rolling"   default="0.3"/>
+  <arg name="proj_max_height_crawling"  default="0.2"/>
+
+   <!-- SLAM -->
+  <include file="$(find simulation_slam)/launch/rtabmap_advanced.launch">
+    <arg name="frame_id"                            value="$(arg frame_id)"/>
+    <arg name="rtabmap_args"                        value="--delete_db_on_start"/>
+    <arg name="camera_info_topic"                   value="/$(arg camera)/color/camera_info"/>
+    <arg name="depth_camera_info_topic"             value="/$(arg camera)/depth/camera_info"/>
+    <arg name="rgb_topic"                           value="/$(arg camera)/color/image_raw"/>
+    <arg name="depth_topic"                         value="/$(arg camera)/depth/image_rect_raw"/>
+    <arg name="rviz"                                value="true"/>
+    <arg name="rtabmap_viz"                         value="false"/>
+    <arg name="approx_sync_max_interval"            value="0.02"/>  <!-- To remove estimations based on rgb and depth shifted in time -->
+    <!-- <arg name="odom_topic"                          value="/$(arg camera)/imu"/> -->
+    <arg name="GridCellSize"                        value="0.04"/>
+    <arg name="OdomStrategy"                        value="1"/>
+    <arg name="VisCorType"                          value="1"/>
+    <arg name="OdomF2MMaxSize"                      value="1000"/>  <!-- reduced maximum features map size-->
+    <arg name="VisMaxFeatures"                      value="600"/>   <!-- reduced maximum features extracted by image-->
+    <arg name="RtabmapStartNewMapOnLoopClosure"     value="false"/>
+    <arg name="RegForce3DoF"                        value="true"/>
+    <arg name="OptimizerSlam2D"                     value="true"/>
+    <arg name="grid_size"                           value="50"/>    <!-- 50 meters wide -->
+    <arg name="cloud_noise_filtering_radius"        value="0.08"/>
+    <arg name="cloud_noise_filtering_min_neighbors" value="5"/>
+    <arg name="proj_max_ground_angle"               value="25"/>
+    <arg name="proj_max_ground_height"              value="$(arg proj_max_ground_height)"/>
+    <arg name="proj_max_height"                     value="$(arg proj_max_height_rolling)"/>
+    <arg name="proj_min_cluster_size"               value="20"/>
+  </include>
+
+  <node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen" />
+
+
+  <node pkg="nodelet" type="nodelet" name="passthrough" args="load pcl/PassThrough pcl_manager" output="screen">
+      <remap from="~input" to="rtabmap/cloud_map" />
+      <remap from="~output" to="passThrough" />
+      <param name="filter_field_name" type="str" value="z"/>
+      <param name="filter_limit_min" type="double" value="$(arg proj_max_ground_height)"/>
+      <param name="filter_limit_max" type="double" value="$(arg proj_max_height_crawling)"/>
+      <param name="filter_limit_negative" type="bool" value="false"/>
+  </node>
+
+
+  <!-- Run a passthrough filter at specific height
+  <node pkg="nodelet" type="nodelet" name="passthrough2" args="load pcl/PassThrough pcl_manager" output="screen">
+    <remap from="~input" to="rtabmap/cloud_map" />
+    <remap from="~output" to="passThrough2" />
+    <rosparam>
+      filter_field_name: z
+      filter_limit_min: 1.5
+      filter_limit_max: 2.0
+      filter_limit_negative: False
+    </rosparam>
+  </node> -->
+
+</launch>

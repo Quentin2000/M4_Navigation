@@ -979,7 +979,7 @@
         <image>
           <width>640</width>
           <height>480</height>
-          <format>RGB8</format>
+          <format>R8G8B8</format>
         </image>
         <clip>
           <!-- give the color sensor a maximum range of 50m so that the simulation renders nicely -->

@@ -73,6 +73,11 @@
       <real_time_factor>1</real_time_factor>
       <real_time_update_rate>1000</real_time_update_rate>
     </physics>
+    <scene>
+      <ambient>0.4 0.4 0.4 1</ambient>
+      <background>0.7 0.7 0.7 1</background>
+      <shadows>1</shadows>
+    </scene>
     <wind/>
     <spherical_coordinates>
       <surface_model>EARTH_WGS84</surface_model>
@@ -81,22 +86,26 @@
       <elevation>0</elevation>
       <heading_deg>0</heading_deg>
     </spherical_coordinates>
-    <model name='Bridge_1_marked'>
-      <pose>-0.371943 0.380268 0 0 -0 0</pose>
-      <static>1</static>
-      <link name='body'>
-        <visual name='visual'>
-          <geometry>
-            <mesh>
-              <uri>model://Bridge_1_marked/media/Bridge_1_marked.dae</uri>
-            </mesh>
-          </geometry>
-        </visual>
+    <model name='heightmap'>
+      <pose>0.193511 0.226524 0 0 -0 0</pose>
+      <link name='link_00'>
+        <pose>0 0 0 0 -0 0</pose>
         <collision name='collision'>
           <geometry>
-            <mesh>
-              <uri>model://Bridge_1_marked/media/Bridge_1_marked.dae</uri>
-            </mesh>
+            <heightmap>
+              <uri>model://random_world/media/materials/texture/random_world.png</uri>
+              <size>20 20 1</size>
+              <pos>0 0 0</pos>
+              <texture>
+                <size>10</size>
+                <diffuse>__default__</diffuse>
+                <normal>__default__</normal>
+              </texture>
+              <blend>
+                <min_height>0</min_height>
+                <fade_dist>0</fade_dist>
+              </blend>
+            </heightmap>
           </geometry>
           <max_contacts>10</max_contacts>
           <surface>
@@ -112,31 +121,64 @@
             </friction>
           </surface>
         </collision>
+        <visual name='visual_abcedf'>
+          <geometry>
+            <heightmap>
+              <use_terrain_paging>0</use_terrain_paging>
+              <texture>
+                <diffuse>file://media/materials/textures/dirt_diffusespecular.png</diffuse>
+                <normal>file://media/materials/textures/flat_normal.png</normal>
+                <size>0.1</size>
+              </texture>
+              <texture>
+                <diffuse>file://media/materials/textures/grass_diffusespecular.png</diffuse>
+                <normal>file://media/materials/textures/flat_normal.png</normal>
+                <size>0.1</size>
+              </texture>
+              <texture>
+                <diffuse>file://media/materials/textures/fungus_diffusespecular.png</diffuse>
+                <normal>file://media/materials/textures/flat_normal.png</normal>
+                <size>0.1</size>
+              </texture>
+              <blend>
+                <min_height>0</min_height>
+                <fade_dist>2</fade_dist>
+              </blend>
+              <blend>
+                <min_height>2</min_height>
+                <fade_dist>5</fade_dist>
+              </blend>
+              <uri>model://random_world/media/materials/texture/random_world.png</uri>
+              <size>20 20 1</size>
+              <pos>0 0 0</pos>
+            </heightmap>
+          </geometry>
+        </visual>
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
       </link>
     </model>
     <state world_name='default'>
-      <sim_time>105 216000000</sim_time>
-      <real_time>144 107138827</real_time>
-      <wall_time>1713913358 436512137</wall_time>
-      <iterations>105216</iterations>
-      <model name='Bridge_1_marked'>
-        <pose>-0.371943 0.380268 0 0 -0 0</pose>
-        <scale>1 1 1</scale>
-        <link name='body'>
-          <pose>-0.371943 0.380268 0 0 -0 0</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
-        </link>
-      </model>
+      <sim_time>136 44000000</sim_time>
+      <real_time>136 454036104</real_time>
+      <wall_time>1713981886 884271240</wall_time>
+      <iterations>136044</iterations>
       <model name='ground_plane'>
         <pose>0 0 0 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='link'>
           <pose>0 0 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='heightmap'>
+        <pose>0.193511 0.226524 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='link_00'>
+          <pose>0.193511 0.226524 0 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
@@ -148,7 +190,7 @@
     </state>
     <gui fullscreen='0'>
       <camera name='user_camera'>
-        <pose>-8.53756 -12.8724 9.98145 0 0.639643 0.780197</pose>
+        <pose>17.1475 -11.4506 13.428 -0 0.585797 2.55219</pose>
         <view_controller>orbit</view_controller>
         <projection_type>perspective</projection_type>
       </camera>

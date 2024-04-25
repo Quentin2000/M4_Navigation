@@ -2,6 +2,7 @@
 
   <include file="$(find simulation_world)/launch/gazebo_rviz.launch">
     <arg name="launch_rviz" value="false"/>
+    <arg name="world_name" value="Cube_2"/>
   </include>
 
   <!-- Arguments -->
