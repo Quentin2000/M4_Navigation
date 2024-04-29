@@ -1,7 +1,7 @@
 <launch>
   <param
     name="robot_description"
-    textfile="$(find simulation_world)/urdf/m4assembly.urdf" />
+    textfile="$(find simulation_world)/urdf/m4assembly_low_power_sim.urdf" />
 
   <!-- launch gazebo simulation with empty world -->
   <!-- <include file="$(find gazebo_ros)/launch/empty_world.launch">
@@ -9,7 +9,7 @@
   
   <!-- launch gazebo simulation with a defined world  -->
   <arg name="gui" default="true"/>
-  <arg name="world_name" default="Cube_3.world"/>
+  <arg name="world_name" default="Cube_2.world"/>
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" value="$(find simulation_world)/worlds/$(arg world_name)"/>
     <arg name="gui" value="$(arg gui)"/>
@@ -28,7 +28,7 @@
     name="tf_footprint_base"
     pkg="tf"
     type="static_transform_publisher"
-    args="0 0 0.28 0 0 0 base_footprint base_link 100" />
+    args="0 0 0.32 0 0 0 base_footprint base_link 100" />
   
   <!-- define joints as calibrated in simulation, joint calibration will need to be checked on startup with real robot -->
   <node
@@ -39,7 +39,7 @@
 
   <!--spawn robot in gazebo -->
   <node name="spawn_model" pkg="gazebo_ros" type="spawn_model" 
-  	args="-file $(find simulation_world)/urdf/m4assembly.urdf -urdf -x 0.0 -y 0.0 -z 2.0 -model m4assembly" output="screen" />
+  	args="-file $(find simulation_world)/urdf/m4assembly_low_power_sim.urdf -urdf -x -6.0 -y 2.0 -z 2.0 -model m4assembly" output="screen" />
 
   <!-- load the controllers -->
   <rosparam file="$(find simulation_world)/config/controller_config.yaml" command="load"/>

@@ -28,7 +28,7 @@
     name="tf_footprint_base"
     pkg="tf"
     type="static_transform_publisher"
-    args="0 0 0.28 0 0 0 base_footprint base_link 100" />
+    args="0 0 0.32 0 0 0 base_footprint base_link 100" />
   
   <!-- define joints as calibrated in simulation, joint calibration will need to be checked on startup with real robot -->
   <node
