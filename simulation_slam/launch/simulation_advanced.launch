@@ -35,7 +35,7 @@
     <arg name="rgb_topic"                           value="/$(arg camera)/color/image_raw"/>
     <arg name="depth_topic"                         value="/$(arg camera)/depth/image_rect_raw"/>
     <arg name="rviz"                                value="true"/>
-    <arg name="rviz_cfg"                            value="$(find simulation_world)/rviz/m4_slam.rviz"/>
+    <arg name="rviz_cfg"                            value="$(find simulation_world)/rviz/m4_nav.rviz"/>
     <arg name="rtabmap_viz"                         value="false"/>
     <arg name="approx_sync_max_interval"            value="0.02"/>  <!-- To remove estimations based on rgb and depth shifted in time -->
     <!-- <arg name="odom_topic"                          value="/$(arg camera)/imu"/> -->
@@ -100,6 +100,10 @@
     <param name="output_grid"      value="/merged_occupancy_grid"/>
   </node>
 
-
+  <!-- move_base -->
+  <include file="$(find simulation_slam)/launch/navigation.launch">
+    <!-- <arg name="model" value="$(arg model)" /> -->
+    <arg name="move_forward_only" value="true"/>
+  </include>
 
 </launch>

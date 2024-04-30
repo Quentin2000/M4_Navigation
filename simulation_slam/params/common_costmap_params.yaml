@@ -1,0 +1,15 @@
+obstacle_range: 4.75 # D455 ideal range max is 6
+raytrace_range: 5.25 # used to differentiate types of obstacles and clear area (greater than obstacle_range)
+
+robot_radius: 0.3
+
+static:
+  map_topic: /crawl_grid_map
+  subscribe_to_updates: true
+
+obstacles:
+  observation_sources: point_cloud
+  point_cloud: {sensor_frame: front_realsense, data_type: PointCloud2, topic: rtabmap/cloud_obstacles, marking: true, clearing: true}
+
+inflation:
+  inflation_radius: 0.8

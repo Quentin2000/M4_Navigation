@@ -1,0 +1,16 @@
+controller_frequency: 10.0 
+controller_patience: 15.0
+planner_frequency: 1.0 # 0 is upon new goal or path blocked
+planner_patience: 5.0
+max_planning_retries: 20
+
+conservative_reset_dist: 0.5 #3.0
+recovery_behavior_enabled: true
+clearing_rotation_allowed: false #keep false
+
+shutdown_costmaps: false
+
+oscillation_timeout:  0.0 # 0?
+oscillation_distance: 0.0
+
+
