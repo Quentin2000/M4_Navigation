@@ -5,7 +5,8 @@
   <!-- Load Gazebo world -->
   <include file="$(find simulation_world)/launch/gazebo_rviz.launch">
     <arg name="launch_rviz" value="false"/>
-    <arg name="world_name"  value="terrain_1.world"/>
+    <arg name="world_name"  value="scenario_3.world"/>
+    <arg name="publish_static_footprint_tf" value="false"/>
   </include>
 
   <!-- SLAM ARGUMENTS -->
@@ -19,8 +20,8 @@
   <arg name="proj_max_ground_angle"     default="15"/>
   <arg name="proj_max_ground_height"    default="0.1"/>
   <arg name="proj_max_height_default"   default="1.2"/>
-  <arg name="proj_max_height_rolling"   default="0.8"/>
-  <arg name="proj_max_height_crawling"  default="0.5"/>
+  <arg name="proj_max_height_rolling"   default="0.5"/>
+  <arg name="proj_max_height_crawling"  default="0.3"/>
 
   <!-- Grid parameters -->
   <arg name="grid_resolution"           default="$(eval arg('cloud_noise_filtering_radius')/2)"/>
@@ -92,15 +93,16 @@
     <param name="grid_size_meters"     value="$(arg grid_size_meters)"/>
   </node>
   
+  <!-- Merge gridmaps -->
   <node name="cost_map_node" pkg="simulation_slam" type="cost_map_node.py" output="screen">
     <param name="input_grid1"      value="/crawl_grid_map"/>
     <param name="input_grid2"      value="/roll_grid_map"/>
-    <param name="grid_cost1"      value="1.0"/>
-    <param name="grid_cost2"      value="0.5"/>
+    <param name="grid_cost1"      value="40"/>
+    <param name="grid_cost2"      value="1"/>
     <param name="output_grid"      value="/merged_occupancy_grid"/>
   </node>
 
-  <!-- move_base -->
+  <!-- Launch move_base -->
   <include file="$(find simulation_slam)/launch/navigation.launch">
     <!-- <arg name="model" value="$(arg model)" /> -->
     <arg name="move_forward_only" value="true"/>

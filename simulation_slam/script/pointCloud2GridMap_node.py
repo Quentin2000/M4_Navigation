@@ -71,11 +71,12 @@ def main():
 
     grid_resolution = rospy.get_param("~grid_resolution", 0.1)  # Grid cell size [m/cell]
     grid_size_meters = rospy.get_param("~grid_size_meters", 10) # Full grid size [m]
+    # mode_cost = rospy.get_param("~mode_cost", 1) # Grid cost for free cells between 1 and 100 (depends on mode FLYING, CRAWLING, or ROLLING) 
     input_cloud = rospy.get_param("~input_cloud", 'crawl_detect_cloud')  # Point cloud to subscribe to
     output_map = rospy.get_param("~output_map", '/crawl_grid_map')  # Grid map to publish
     grid_size_x = int(grid_size_meters / grid_resolution) # Number of grid cells in X direction [cells]
     grid_size_y = int(grid_size_meters / grid_resolution) # Number of grid cells in Y direction [cells]
-    grid_map = np.zeros((grid_size_x, grid_size_y), dtype=np.int8)
+    grid_map = np.full((grid_size_x, grid_size_y), 1)
 
     # Subscribe to point cloud topic
     rospy.Subscriber(input_cloud, PointCloud2, point_cloud_callback)

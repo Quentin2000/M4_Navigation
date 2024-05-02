@@ -12,8 +12,8 @@ class OccupancyGridMerger:
         input_grid1 = rospy.get_param("~input_grid1", '/crawling_grid_map')  # Grid map to subscribe to
         input_grid2 = rospy.get_param("~input_grid2", '/rolling_grid_map')  # Grid map to subscribe to
 
-        self.grid_cost1 = rospy.get_param("~grid_cost1", 1.0) # Cost within [0:1] to traverse the grid
-        self.grid_cost2 = rospy.get_param("~grid_cost2", 0.5) # Cost within [0:1] to traverse the grid
+        self.grid_cost1 = rospy.get_param("~grid_cost1", 40) # Cost within [0:100] to traverse the grid
+        self.grid_cost2 = rospy.get_param("~grid_cost2", 20) # Cost within [0:100] to traverse the grid
 
         self.output_grid = rospy.get_param("~output_grid", '/merged_occupancy_grid')  # Grid map to publish
 
@@ -67,9 +67,9 @@ class OccupancyGridMerger:
             # # Flatten the smaller map array
             # flattened_occupancy_grid2_array_small = occupancy_grid2_array_small.flatten()
 
-            occupancy_grid_array1 = np.array(self.occupancy_grid1.data)
-            occupancy_grid_array2 = np.array(self.occupancy_grid2.data)
-            occupancy_grid_merged_data = np.minimum(self.grid_cost1*occupancy_grid_array1 + self.grid_cost2*occupancy_grid_array2, 100).astype(np.int8)
+            occupancy_grid_array1 = np.minimum(np.array(self.occupancy_grid1.data)*self.grid_cost1, 100)
+            occupancy_grid_array2 = np.minimum(np.array(self.occupancy_grid2.data)*self.grid_cost2, 100)
+            occupancy_grid_merged_data = np.minimum(occupancy_grid_array1, occupancy_grid_array2).astype(np.int8)
 
             # Create a new occupancy grid to match the size of the larger occupancy grid
             merged_occupancy_grid = OccupancyGrid()

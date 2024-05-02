@@ -15,9 +15,9 @@ class KeyTeleop:
         # Subscribe to the key teleop topic
         # rospy.Subscriber('/cmd_vel', Twist, self.key_callback)
 
-        self.max_linear_speed = 1.5  # Adjust as needed
+        self.max_linear_speed = 0.6  # Adjust as needed
         self.max_angular_speed = 2.0  # Adjust as needed
-        self.acceleration = 0.6  # Adjust as needed
+        self.acceleration = 0.2  # Adjust as needed
         self.deceleration = 0.8  # Adjust as needed
 
         self.current_linear_speed = 0.0

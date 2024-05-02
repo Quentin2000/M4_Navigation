@@ -9,9 +9,9 @@
   
   <!-- launch gazebo simulation with a defined world  -->
   <arg name="gui" default="true"/>
-  <arg name="world_name" default="terrain_1"/>
+  <arg name="world_name" default="scenario_1.world"/>
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="world_name" value="$(find simulation_world)/worlds/$(arg world_name).world"/>
+    <arg name="world_name" value="$(find simulation_world)/worlds/$(arg world_name)"/>
     <arg name="gui" value="$(arg gui)"/>
     <arg name="paused" value="false"/>
     <arg name="use_sim_time" value="true"/>
@@ -19,8 +19,11 @@
     <arg name="debug" value="false"/>
   </include>
   
-<!-- launch keyboard controller -->
+  <!-- launch keyboard controller -->
   <node name="key_controller_node" pkg="m4assembly" type="key_controller.py" output="screen"/>
+
+  <!-- launch robot mode controller node -->
+  <node name="robot_mode_switch" pkg="simulation_world" type="robot_mode_switch.py" output="screen"/>
   
 
   <!-- initialize transforms -->
@@ -39,7 +42,7 @@
 
   <!--spawn robot in gazebo -->
   <node name="spawn_model" pkg="gazebo_ros" type="spawn_model" 
-  	args="-file $(find simulation_world)/urdf/m4assembly.urdf -urdf -x 0.0 -y 0.0 -z 2.0 -model m4assembly" output="screen" />
+  	args="-file $(find simulation_world)/urdf/m4assembly_low_power_sim.urdf -urdf -x 0.0 -y 0.0 -z 2.0 -model m4assembly" output="screen" />
 
   <!-- load the controllers -->
   <rosparam file="$(find simulation_world)/config/controller_config.yaml" command="load"/>

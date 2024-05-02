@@ -4,12 +4,13 @@ raytrace_range: 5.25 # used to differentiate types of obstacles and clear area (
 robot_radius: 0.3
 
 static:
-  map_topic: /crawl_grid_map
+  map_topic: /merged_occupancy_grid
   subscribe_to_updates: true
+  trinary_costmap: false
 
 obstacles:
   observation_sources: point_cloud
-  point_cloud: {sensor_frame: front_realsense, data_type: PointCloud2, topic: rtabmap/cloud_obstacles, marking: true, clearing: true}
+  point_cloud: {sensor_frame: front_realsense, data_type: PointCloud2, topic: /crawl_detect_cloud, marking: true, clearing: true}
 
 inflation:
   inflation_radius: 0.8

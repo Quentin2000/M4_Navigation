@@ -2,7 +2,7 @@
 
   <include file="$(find simulation_world)/launch/gazebo_rviz.launch">
     <arg name="launch_rviz" value="false"/>
-    <arg name="world_name" value="Cube_2"/>
+    <arg name="world_name" value="scenario_1.world"/>
   </include>
 
   <!-- Arguments -->
@@ -34,6 +34,9 @@
     <param name="proj_min_cluster_size" value="20"/>
     <param name="grid_cell_size" value="20"/> -->
   </include>
+
+  <!-- Launch robot mode controller node -->
+  <node name="robot_mode_switch" pkg="simulation_world" type="robot_mode_switch.py" output="screen"/>
      
 </launch>
 

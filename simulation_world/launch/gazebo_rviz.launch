@@ -19,17 +19,7 @@
     <arg name="debug" value="false"/>
     <arg name="verbose" value="true"/>
   </include>
-  
-  <!-- launch keyboard controller -->
-  <node name="key_controller_node" pkg="m4assembly" type="key_controller.py" output="screen"/>
-  
-  <!-- initialize transforms -->
-  <node
-    name="tf_footprint_base"
-    pkg="tf"
-    type="static_transform_publisher"
-    args="0 0 0.32 0 0 0 base_footprint base_link 100" />
-  
+
   <!-- define joints as calibrated in simulation, joint calibration will need to be checked on startup with real robot -->
   <node
     name="fake_joint_calibration"
@@ -37,9 +27,34 @@
     type="rostopic"
     args="pub /calibrated std_msgs/Bool true" />
 
+  <!-- converts joint states to TF transforms -->
+  <node pkg="robot_state_publisher" type="robot_state_publisher"  name="robot_state_publisher">
+    <remap from="/joint_states" to="/m4assembly/joint_states" />
+  </node>
+
+  <arg name="publish_static_footprint_tf" default="false"/>
+  <group if="$(arg publish_static_footprint_tf)">
+    <!-- initialize static base_footprint transform -->
+    <node
+      name="tf_footprint_base"
+      pkg="tf"
+      type="static_transform_publisher"
+      args="0 0 0.32 0 0 0 base_footprint base_link 100" />
+  </group>
+  <group unless="$(arg publish_static_footprint_tf)">
+    <!-- launch dynamic base_footprint publisher node -->
+    <node name="base_footprint_pub" pkg="simulation_world" type="base_footprint_pub.py" output="screen"/>
+  </group>
+  
+  <!-- launch keyboard controller -->
+  <node name="key_controller_node" pkg="m4assembly" type="key_controller.py" output="screen"/>
+
+  <!-- launch robot mode controller node -->
+  <node name="robot_mode_switch" pkg="simulation_world" type="robot_mode_switch.py" output="screen"/>
+    
   <!--spawn robot in gazebo -->
   <node name="spawn_model" pkg="gazebo_ros" type="spawn_model" 
-  	args="-file $(find simulation_world)/urdf/m4assembly_low_power_sim.urdf -urdf -x -7.0 -y 2.0 -z 2.0 -model m4assembly" output="screen" />
+  	args="-file $(find simulation_world)/urdf/m4assembly_low_power_sim.urdf -urdf -x 3.0 -y 0.0 -z 2.0 -model m4assembly" output="screen" />
 
   <!-- load the controllers -->
   <rosparam file="$(find simulation_world)/config/controller_config.yaml" command="load"/>
@@ -58,14 +73,8 @@
           blade3_position_controller
           blade4_position_controller  
           joint_state_controller "/>
-            
-  <!-- converts joint states to TF transforms -->
-  <node pkg="robot_state_publisher" type="robot_state_publisher"  name="robot_state_publisher">
-    <remap from="/joint_states" to="/m4assembly/joint_states" />
-  </node>
 
   <arg name="launch_rviz" default="true" />
-
   <!-- launch rviz -->
 <group if="$(arg launch_rviz)">
   <node
