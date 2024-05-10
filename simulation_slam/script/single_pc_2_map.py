@@ -67,7 +67,7 @@ def main():
     global grid_size_y
 
     # Initialize ROS node
-    rospy.init_node('pointCloud2GridMap_node')
+    rospy.init_node('single_pc_2_map_node')
 
     grid_resolution = rospy.get_param("~grid_resolution", 0.1)  # Grid cell size [m/cell]
     grid_size_meters = rospy.get_param("~grid_size_meters", 10) # Full grid size [m]

@@ -40,7 +40,7 @@ class DynamicTFBroadcaster:
                 (trans, rot) = listener.lookupTransform(self.ref_link, self.target_link, rospy.Time(0))
                 rot_x = rot[0]
                 distance_z = -trans[2]  # Z translation
-                rospy.loginfo("Distance in X rotation: {}".format(rot_x))
+                # rospy.loginfo("Distance in X rotation: {}".format(rot_x))
                 # rospy.loginfo("Distance in Z translation: {}".format(distance_z))
 
                 self.compute_ground_contact_transform(distance_z, rot_x)

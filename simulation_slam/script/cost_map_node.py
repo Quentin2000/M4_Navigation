@@ -2,7 +2,9 @@
 
 import rospy
 from nav_msgs.msg import OccupancyGrid
+from simulation_slam.msg import DualOccupancyGrid
 import numpy as np
+from scipy.ndimage import binary_dilation 
 
 class OccupancyGridMerger:
     def __init__(self):
@@ -11,17 +13,19 @@ class OccupancyGridMerger:
 
         input_grid1 = rospy.get_param("~input_grid1", '/crawling_grid_map')  # Grid map to subscribe to
         input_grid2 = rospy.get_param("~input_grid2", '/rolling_grid_map')  # Grid map to subscribe to
+        self.input_grid_dual = rospy.get_param("~input_grid_dual", 'None')  # Grid map to subscribe to
 
         self.grid_cost1 = rospy.get_param("~grid_cost1", 40) # Cost within [0:100] to traverse the grid
         self.grid_cost2 = rospy.get_param("~grid_cost2", 20) # Cost within [0:100] to traverse the grid
 
         self.output_grid = rospy.get_param("~output_grid", '/merged_occupancy_grid')  # Grid map to publish
 
-        # Subscribe to the first occupancy grid topic
-        rospy.Subscriber(input_grid1, OccupancyGrid, self.occupancy_grid1_callback)
-
-        # Subscribe to the second occupancy grid topic
-        rospy.Subscriber(input_grid2, OccupancyGrid, self.occupancy_grid2_callback)
+        if self.input_grid_dual == 'None':
+            # Subscribe to the occupancy grid topics
+            rospy.Subscriber(input_grid1, OccupancyGrid, self.occupancy_grid1_callback)
+            rospy.Subscriber(input_grid2, OccupancyGrid, self.occupancy_grid2_callback)
+        else:
+            rospy.Subscriber(self.input_grid_dual, DualOccupancyGrid, self.occupancy_grid_dual_callback)
 
         # Publisher to publish the merged occupancy grid
         self.merged_occupancy_grid_pub = rospy.Publisher(self.output_grid, OccupancyGrid, queue_size=10)
@@ -29,6 +33,16 @@ class OccupancyGridMerger:
         # Initialize variables to hold the occupancy grid data
         self.occupancy_grid1 = None
         self.occupancy_grid2 = None
+
+        # Set the rate at which the merging operation is performed (2Hz)
+        self.rate = rospy.Rate(2)
+
+    def occupancy_grid_dual_callback(self, msg):
+        # Store the received occupancy grid data
+        self.occupancy_grid1 = msg.grid1
+        self.occupancy_grid2 = msg.grid2
+        # Call the function to merge the occupancy grids
+        self.merge_occupancy_grids()
 
     def occupancy_grid1_callback(self, msg):
         # Store the received occupancy grid data
@@ -42,34 +56,24 @@ class OccupancyGridMerger:
         # Call the function to merge the occupancy grids
         self.merge_occupancy_grids()
 
-
     def merge_occupancy_grids(self):
         # Check if both occupancy grids are received
         if self.occupancy_grid1 is not None and self.occupancy_grid2 is not None:
 
-            # width2 = self.occupancy_grid2.info.width
-            # height2 = self.occupancy_grid2.info.height
-            # occupancy_grid2_array = np.array(self.occupancy_grid2.data).reshape(width2, height2)
+            # occupancy_grid_array1 = np.minimum(np.array(self.occupancy_grid1.data)*self.grid_cost1, 100)
+            # occupancy_grid_array2 = np.minimum(np.array(self.occupancy_grid2.data)*self.grid_cost2, 100)
+            # occupancy_grid_merged_data = np.minimum(occupancy_grid_array1, occupancy_grid_array2).astype(np.int8)
 
-            # # Calculate the starting and ending indices for rows and columns
-            # center_row = height2 // 2
-            # center_col = width2 // 2
-            # half_rows = self.occupancy_grid2.info.height // 2
-            # half_cols = self.occupancy_grid2.info.width // 2
-            # start_row = center_row - half_rows
-            # end_row = center_row + half_rows
-            # start_col = center_col - half_cols
-            # end_col = center_col + half_cols
+            occupancy_grid_data1 = np.array(self.occupancy_grid1.data, dtype=np.int32)
+            occupancy_grid_data2 = np.array(self.occupancy_grid2.data, dtype=np.int32) 
+            merged_data = np.minimum(occupancy_grid_data1 * self.grid_cost1, occupancy_grid_data2 * self.grid_cost2)
+            occupancy_grid_merged_data = np.minimum(merged_data, 100).astype(np.int8)
 
-            # # Extract the desired region from the map array
-            # occupancy_grid2_array_small = occupancy_grid2_array[start_row:end_row, start_col:end_col]
-
-            # # Flatten the smaller map array
-            # flattened_occupancy_grid2_array_small = occupancy_grid2_array_small.flatten()
-
-            occupancy_grid_array1 = np.minimum(np.array(self.occupancy_grid1.data)*self.grid_cost1, 100)
-            occupancy_grid_array2 = np.minimum(np.array(self.occupancy_grid2.data)*self.grid_cost2, 100)
-            occupancy_grid_merged_data = np.minimum(occupancy_grid_array1, occupancy_grid_array2).astype(np.int8)
+            # Inflate the costs from higher one to lower one to make sure that the robot is always in the most optimal configuration before entering a different mode zone. 
+            # occupancy_grid_merged_data = self.increase_coverage(occupancy_grid_merged_data, self.occupancy_grid1.info.width, self.occupancy_grid1.info.height, 40, 10)
+            # if self.input_grid_dual == 'None':
+            occupancy_grid_merged_data = self.inflate_cost(occupancy_grid_merged_data.reshape((self.occupancy_grid1.info.width, self.occupancy_grid1.info.height)), 100, 1)
+            occupancy_grid_merged_data = self.inflate_cost(occupancy_grid_merged_data.reshape((self.occupancy_grid1.info.width, self.occupancy_grid1.info.height)), 40, 10)
 
             # Create a new occupancy grid to match the size of the larger occupancy grid
             merged_occupancy_grid = OccupancyGrid()
@@ -81,94 +85,24 @@ class OccupancyGridMerger:
             # Publish the merged occupancy grid
             self.merged_occupancy_grid_pub.publish(merged_occupancy_grid)
 
+            # Sleep to control the rate
+            self.rate.sleep()
+
+    def inflate_cost(self, grid, cost, radius):
+        cost_mask = grid == cost
+        obstacle_mask = grid == 100 # Obstacle cost
+
+        selem = np.ones((2*radius + 1, 2*radius +1))
+        inflated_cost_mask = binary_dilation(cost_mask, structure=selem)
+
+        inflated_grid = np.where(inflated_cost_mask, cost, grid)
+        inflated_grid_2 = np.where(obstacle_mask, 100, inflated_grid)
+
+        return inflated_grid_2.flatten()
+
 if __name__ == '__main__':
     try:
         occupancy_grid_merger = OccupancyGridMerger()
         rospy.spin()
     except rospy.ROSInterruptException:
         pass
-
-
-# import rospy
-# from nav_msgs.msg import OccupancyGrid
-# import numpy as np
-
-# def occupancy_grid1_callback(msg):
-#     global occupancy_grid1
-#     # Store the received occupancy grid data
-#     occupancy_grid1 = msg
-#     # Call the function to merge the occupancy grids
-#     merge_occupancy_grids()
-
-# def occupancy_grid2_callback(msg):
-#     global occupancy_grid2
-#     # Store the received occupancy grid data
-#     occupancy_grid2 = msg
-#     # Call the function to merge the occupancy grids
-#     merge_occupancy_grids()
-
-# def merge_occupancy_grids():
-#     # Check if both occupancy grids are received
-#     if occupancy_grid1 is not None and occupancy_grid2 is not None:
-#         # Convert occupancy grid data to NumPy arrays for efficient computation
-#         grid1 = np.array(occupancy_grid1.data).reshape(occupancy_grid1.info.height, occupancy_grid1.info.width)
-#         grid2 = np.array(occupancy_grid2.data).reshape(occupancy_grid2.info.height, occupancy_grid2.info.width)
-
-#         # Get dimensions of both occupancy grids
-#         rows1, cols1 = grid1.shape
-#         rows2, cols2 = grid2.shape
-
-#         # Determine the difference in size between the two occupancy grids
-#         row_diff = rows2 - rows1
-#         col_diff = cols2 - cols1
-
-#         # Create a new occupancy grid to match the size of the larger occupancy grid
-#         merged_occupancy_grid = OccupancyGrid()
-#         merged_occupancy_grid.header.stamp = rospy.Time.now()
-#         merged_occupancy_grid.info = occupancy_grid1.info
-
-#         # Expand the smaller occupancy grid by adding zero cells around its edges
-#         if row_diff > 0:
-#             zero_rows = np.zeros((row_diff, cols1), dtype=np.int8)
-#             grid1 = np.vstack((grid1, zero_rows))
-#             merged_occupancy_grid.info.height += row_diff
-#             merged_occupancy_grid.info.origin.position.y = - (merged_occupancy_grid.info.height // 2) * merged_occupancy_grid.info.resolution
-#         elif row_diff < 0:
-#             zero_rows = np.zeros((-row_diff, cols2), dtype=np.int8)
-#             grid2 = np.vstack((grid2, zero_rows))
-#         if col_diff > 0:
-#             zero_cols = np.zeros((rows1, col_diff), dtype=np.int8)
-#             grid1 = np.hstack((grid1, zero_cols))
-#             merged_occupancy_grid.info.width += col_diff
-#             merged_occupancy_grid.info.origin.position.x = - (merged_occupancy_grid.info.width // 2) * merged_occupancy_grid.info.resolution
-#         elif col_diff < 0:
-#             zero_cols = np.zeros((rows2, -col_diff), dtype=np.int8)
-#             grid2 = np.hstack((grid2, zero_cols))
-
-#         # Sum the values of the corresponding cells in the two occupancy grids
-#         merged_grid = min(0.5*grid1 + grid2, 100)
-
-#         # Convert the merged grid back to a 1D list
-#         merged_occupancy_grid.data = merged_grid.flatten().tolist()
-
-#         # Publish the merged occupancy grid
-#         merged_occupancy_grid_pub.publish(merged_occupancy_grid)
-
-# def main():
-#     global merged_occupancy_grid_pub
-
-#     rospy.init_node('cost_map_node', anonymous=True)
-
-#     # Subscribe to the first occupancy grid topic
-#     rospy.Subscriber('/rtabmap/grid_map', OccupancyGrid, occupancy_grid1_callback)
-
-#     # Subscribe to the second occupancy grid topic
-#     rospy.Subscriber('/crawl_grid_map', OccupancyGrid, occupancy_grid2_callback)
-
-#     # Publisher to publish the merged occupancy grid
-#     merged_occupancy_grid_pub = rospy.Publisher('/merged_occupancy_grid', OccupancyGrid, queue_size=10)
-
-#     rospy.spin()
-
-# if __name__ == '__main__':
-#     main()

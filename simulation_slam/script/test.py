@@ -1,10 +1,10 @@
-
+from scipy.ndimage import binary_dilation 
 import numpy as np
 
 input = [100,   1,   1,   1,   1,   1, 100,   1,   1,   1,   1, 100, 100,   1, 100, 100,   1,   1,
    1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,
    1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,
-   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,
+   1,   1,   1,   1,   1,   1,   1,   40,   1,   1,   1,   1,   1,   40,   1,   1,   1,   1,
    1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,
    1,   1,   1,   1,   1,   1,   1,   1,   1,   1]
 
@@ -15,16 +15,27 @@ input2 = [100,   100,   100,   1,   1,   1, 100,   1,   1,   1,   1, 100, 100,  
    1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,
    1,   1,   1,   1,   1,   1,   1,   1,   1,   1]
 
+print(len(input))
 
-output = np.minimum(20*np.array(input), 100)
-output2 = np.minimum(40*np.array(input2), 100)
+input_np = np.array(input)
 
-output3 = np.minimum(output, output2).astype(np.int8)
 
-print(output)
+def inflate_cost(grid, cost, radius):
+   cost_mask = grid == cost
+   obstacle_mask = grid == 100 # Obstacle cost
 
-output_list = output.tolist()
+   selem = np.ones((2*radius + 1, 2*radius +1))
+   inflated_cost_mask = binary_dilation(cost_mask, structure=selem)
 
-print(output_list)
+   print(inflated_cost_mask)
 
-print(type(output_list))
+   inflated_grid = np.where(inflated_cost_mask, cost, grid)
+
+   print(inflated_grid)
+
+   inflated_grid = np.where(obstacle_mask, 100, grid)
+
+   print(inflated_grid.flatten())
+
+inflate_cost(input_np.reshape((25, 4)), 40, 1)
+

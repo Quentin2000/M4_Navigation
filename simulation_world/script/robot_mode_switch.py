@@ -4,7 +4,6 @@ import rospy
 import numpy as np
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Float64
-from math import radians
 
 class JointCommander:
     def __init__(self):

@@ -39,21 +39,21 @@
       <elevation>0</elevation>
       <heading_deg>0</heading_deg>
     </spherical_coordinates>
-    <model name='Bridge_1'>
-      <pose>-1.43796 1.98081 0 0 -0 0</pose>
+    <model name='scenario_4a'>
+      <pose>-0.650705 1.79101 0 0 -0 0</pose>
       <static>1</static>
       <link name='body'>
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://Bridge_1/media/Bridge_1.dae</uri>
+              <uri>model://scenario_4a/media/Scenario_4a.dae</uri>
             </mesh>
           </geometry>
         </visual>
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://Bridge_1/media/Bridge_1.dae</uri>
+              <uri>model://scenario_4a/media/Scenario_4a.dae</uri>
             </mesh>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -76,15 +76,15 @@
       </link>
     </model>
     <state world_name='default'>
-      <sim_time>133 243000000</sim_time>
-      <real_time>133 512777558</real_time>
-      <wall_time>1715013145 636425254</wall_time>
-      <iterations>133243</iterations>
-      <model name='Bridge_1'>
-        <pose>2.4121 4.63011 0 0 0 -1.57533</pose>
+      <sim_time>120 953000000</sim_time>
+      <real_time>122 69449430</real_time>
+      <wall_time>1715017069 83282140</wall_time>
+      <iterations>120953</iterations>
+      <model name='scenario_4a'>
+        <pose>10.4008 0.060912 0 0 0 -1.57089</pose>
         <scale>1 1 1</scale>
         <link name='body'>
-          <pose>2.4121 4.63011 0 0 0 -1.57533</pose>
+          <pose>10.4008 0.060912 0 0 0 -1.57089</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
@@ -96,7 +96,7 @@
     </state>
     <gui fullscreen='0'>
       <camera name='user_camera'>
-        <pose>-9.17836 -1.09187 4.84105 0 0.339643 0.124206</pose>
+        <pose>-0.487443 -25.8759 22.7615 0 0.667642 1.3202</pose>
         <view_controller>orbit</view_controller>
         <projection_type>perspective</projection_type>
       </camera>

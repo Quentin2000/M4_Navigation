@@ -1,0 +1,2 @@
+nav_msgs/OccupancyGrid grid1
+nav_msgs/OccupancyGrid grid2
