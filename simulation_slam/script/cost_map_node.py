@@ -19,6 +19,7 @@ class OccupancyGridMerger:
         self.grid_cost2 = rospy.get_param("~grid_cost2", 20) # Cost within [0:100] to traverse the grid
 
         self.output_grid = rospy.get_param("~output_grid", '/merged_occupancy_grid')  # Grid map to publish
+        self.merged_occupancy_grid_pub_inflated_topic = self.output_grid + "_inflated"
 
         if self.input_grid_dual == 'None':
             # Subscribe to the occupancy grid topics
@@ -29,6 +30,7 @@ class OccupancyGridMerger:
 
         # Publisher to publish the merged occupancy grid
         self.merged_occupancy_grid_pub = rospy.Publisher(self.output_grid, OccupancyGrid, queue_size=10)
+        self.merged_occupancy_grid_pub_inflated = rospy.Publisher(self.merged_occupancy_grid_pub_inflated_topic, OccupancyGrid, queue_size=10)
 
         # Initialize variables to hold the occupancy grid data
         self.occupancy_grid1 = None
@@ -69,12 +71,6 @@ class OccupancyGridMerger:
             merged_data = np.minimum(occupancy_grid_data1 * self.grid_cost1, occupancy_grid_data2 * self.grid_cost2)
             occupancy_grid_merged_data = np.minimum(merged_data, 100).astype(np.int8)
 
-            # Inflate the costs from higher one to lower one to make sure that the robot is always in the most optimal configuration before entering a different mode zone. 
-            # occupancy_grid_merged_data = self.increase_coverage(occupancy_grid_merged_data, self.occupancy_grid1.info.width, self.occupancy_grid1.info.height, 40, 10)
-            # if self.input_grid_dual == 'None':
-            occupancy_grid_merged_data = self.inflate_cost(occupancy_grid_merged_data.reshape((self.occupancy_grid1.info.width, self.occupancy_grid1.info.height)), 100, 1)
-            occupancy_grid_merged_data = self.inflate_cost(occupancy_grid_merged_data.reshape((self.occupancy_grid1.info.width, self.occupancy_grid1.info.height)), 40, 10)
-
             # Create a new occupancy grid to match the size of the larger occupancy grid
             merged_occupancy_grid = OccupancyGrid()
             merged_occupancy_grid.header.stamp = rospy.Time.now()
@@ -84,6 +80,22 @@ class OccupancyGridMerger:
 
             # Publish the merged occupancy grid
             self.merged_occupancy_grid_pub.publish(merged_occupancy_grid)
+
+            # Inflate the costs from higher one to lower one to make sure that the robot is always in the most optimal configuration before entering a different mode zone. 
+            # occupancy_grid_merged_data = self.increase_coverage(occupancy_grid_merged_data, self.occupancy_grid1.info.width, self.occupancy_grid1.info.height, 40, 10)
+            # if self.input_grid_dual == 'None':
+            occupancy_grid_merged_data = self.inflate_cost(occupancy_grid_merged_data.reshape((self.occupancy_grid1.info.width, self.occupancy_grid1.info.height)), 100, 1)
+            occupancy_grid_merged_data = self.inflate_cost(occupancy_grid_merged_data.reshape((self.occupancy_grid1.info.width, self.occupancy_grid1.info.height)), 40, 10)
+
+            # Create a new occupancy grid to match the size of the larger occupancy grid
+            merged_occupancy_grid_inflated = OccupancyGrid()
+            merged_occupancy_grid_inflated.header.stamp = rospy.Time.now()
+            merged_occupancy_grid_inflated.header.frame_id = "map"
+            merged_occupancy_grid_inflated.info = self.occupancy_grid1.info
+            merged_occupancy_grid_inflated.data = occupancy_grid_merged_data
+
+            # Publish the merged occupancy grid
+            self.merged_occupancy_grid_pub_inflated.publish(merged_occupancy_grid_inflated)
 
             # Sleep to control the rate
             self.rate.sleep()
