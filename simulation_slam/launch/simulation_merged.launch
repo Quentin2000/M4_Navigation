@@ -27,8 +27,9 @@
   <arg name="use_dual_map_msg"          default="true"/>
   <arg name="grid_resolution"           default="$(eval arg('cloud_noise_filtering_radius')/2)"/>
   <arg name="grid_size_meters"          default="40"/>
-  <arg name="cost_crawling"             default="40"/>
-  <arg name="cost_rolling"              default="1"/>
+  <arg name="cost_crawling"             default="45"/>
+  <arg name="cost_rolling"              default="30"/>
+  <arg name="cost_transitioning"        default="50"/>
 
 
    <!-- SLAM -->
@@ -117,11 +118,11 @@
   
   <!-- Merge gridmaps -->
   <node name="cost_map_node" pkg="simulation_slam" type="cost_map_node.py" output="screen">
-    <param name="input_grid1"      value="/crawl_grid_map"/>
-    <param name="input_grid2"      value="/roll_grid_map"/>
+    <param name="input_grid_rolling"      value="/roll_grid_map"/>
+    <param name="input_grid_crawling"      value="/crawl_grid_map"/>
     <param name="input_grid_dual" value='/dual_grid_map'/>
-    <param name="grid_cost1"      value="$(arg cost_crawling)"/>
-    <param name="grid_cost2"      value="$(arg cost_rolling)"/>
+    <param name="cost_rolling"      value="$(arg cost_rolling)"/>  <!-- grid_cost_1 needs to be higher than grid_cost_2 as it will be inflated -->
+    <param name="cost_crawling"      value="$(arg cost_crawling)"/>
     <param name="output_grid"      value="/merged_occupancy_grid"/>
   </node>
 
@@ -135,6 +136,16 @@
   <node name="mode_detect_node" pkg="simulation_slam" type="mode_detect_node.py" output="screen">
     <param name="cost_crawling"     value="$(arg cost_crawling)"/>
     <param name="cost_rolling"      value="$(arg cost_rolling)"/>
+  </node>
+
+  <!-- Launch navigation state estimator node for the variables "is_moving" and "is_transitioning" (between modes) -->
+  <node name="navigation_state_estimator_node" pkg="simulation_slam" type="navigation_state_estimator.py" output="screen"/>
+
+  <!-- Launch power consumption computation node -->
+  <node name="power_computation_node" pkg="simulation_slam" type="power_computation.py" output="screen">
+    <param name="cost_crawling"       value="$(arg cost_crawling)"/>
+    <param name="cost_rolling"        value="$(arg cost_rolling)"/>
+    <param name="cost_transitioning"  value="$(arg cost_transitioning)"/>
   </node>
   
 </launch>

@@ -20,7 +20,7 @@
   </include>
   
   <!-- launch keyboard controller -->
-  <node name="key_controller_node" pkg="m4assembly" type="key_controller.py" output="screen"/>
+  <node name="key_controller_node" pkg="simulation_world" type="key_controller.py" output="screen"/>
 
   <!-- launch robot mode controller node -->
   <node name="robot_mode_switch" pkg="simulation_world" type="robot_mode_switch.py" output="screen"/>

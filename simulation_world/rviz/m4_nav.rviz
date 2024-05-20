@@ -281,7 +281,7 @@ Visualization Manager:
       Draw Behind: false
       Enabled: true
       Name: Map
-      Topic: /merged_occupancy_grid
+      Topic: /merged_occupancy_grid_inflated
       Unreliable: false
       Use Timestamp: false
       Value: false

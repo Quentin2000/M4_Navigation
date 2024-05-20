@@ -151,6 +151,9 @@
   <arg name="fiducial_topic"           default="/fiducial_transforms" />  <!-- aruco_detect async subscription, use tag_linear_variance and tag_angular_variance to set covriance -->
 
   <!-- === SLAM Advanced Parameters === -->
+  <arg name="GridFromDepth"                   default="true"/>
+  <arg name="RtabmapRangeMax"                  default="20.0"/>
+  <arg name="GridRangeMax"                    default="20.0"/>
   <arg name="GridCellSize"                    default="0.02"/>
   <arg name="OdomStrategy"                    default="1"/>
   <arg name="VisCorType"                      default="1"/>
@@ -429,6 +432,9 @@
       <remap from="odom"                   to="$(arg odom_topic)"/>
       <remap from="imu"                    to="$(arg imu_topic)"/>
 
+      <param name="Grid/FromDepth" type="string" value="$(arg GridFromDepth)"/>
+      <param name="Rtabmap/RangeMax" type="Double" value="$(arg RtabmapRangeMax)"/>
+      <param name="Grid/RangeMax" type="Double" value="$(arg GridRangeMax)"/> 
       <param name="Grid/CellSize" type="Double" value="$(arg GridCellSize)"/> <!--1:F2F vs 0:F2M-->
       <param name="Odom/Strategy" value="$(arg OdomStrategy)"/> <!--1:F2F vs 0:F2M-->
       <param name="Vis/CorType" value="$(arg VisCorType)"/> <!--using Optical Flow matching Correspondences insead of feature matching -->

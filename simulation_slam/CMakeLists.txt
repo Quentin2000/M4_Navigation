@@ -12,6 +12,8 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   FILES
   DualOccupancyGrid.msg
+  NavigationState.msg
+  OccupancyGridFlagged.msg
 )
 
 generate_messages(

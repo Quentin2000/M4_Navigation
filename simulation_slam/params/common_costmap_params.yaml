@@ -1,8 +1,8 @@
 obstacle_range: 4.75 # D455 ideal range max is 6
 raytrace_range: 5.25 # used to differentiate types of obstacles and clear area (greater than obstacle_range)
 
-robot_radius: 0.3
-# footprint: [[-0.35,-0.3], [0.35,-0.3],[0.35, 0.3],[-0.35, 0.3]]
+# robot_radius: 0.3
+footprint: [[-0.35,-0.2], [0.35,-0.2],[0.35, 0.2],[-0.35, 0.2]]
 
 static:
   map_topic: /merged_occupancy_grid_inflated
