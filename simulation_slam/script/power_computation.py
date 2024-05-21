@@ -63,6 +63,11 @@ class PowerComputationNode:
 
                 # Compute time since last mode change
                 elapsed_time = (current_time - self.last_time).to_sec()
+
+                # Update last moving time
+                self.last_time = rospy.Time.now()
+                
+                # Pulish elapsed time for debug purposes
                 self.pub_elapsed_time.publish(elapsed_time)
 
                 # Compute and publish energy comsumption per mode: E [J] = P [W] * dT [sec]
@@ -70,8 +75,6 @@ class PowerComputationNode:
                     self.computed_cost_rolling = self.computed_cost_rolling + self.cost_rolling * elapsed_time
                 elif self.current_mode == "CRAWLING":
                     self.computed_cost_crawling = self.computed_cost_crawling + self.cost_crawling * elapsed_time
-
-                self.last_time = rospy.Time.now()
            
             else:
                 # Restart timer until the robot starts moving again to avoid integrating energy when robot is idle 
@@ -90,12 +93,13 @@ class PowerComputationNode:
 
                 # Compute time since start of transition [sec]
                 elapsed_time = (current_time - self.last_transitioning_time).to_sec()
+                
+                # Update last transition time
+                self.last_transitioning_time = rospy.Time.now()
 
                 # Compute and publish energy comsumption for transitioning: E [J] = P [W] * dT [sec]
                 self.computed_cost_transitioning = self.computed_cost_transitioning + self.cost_transitioning * elapsed_time
 
-                self.last_transitioning_time = rospy.Time.now()
-        
             else:
                 # If stopped transitioning, reset the transition state to restart the last_transitioning_time timer
                 self.prev_is_transitioning = False
@@ -111,7 +115,7 @@ class PowerComputationNode:
         self.pub_cost_total.publish(total_cost)
 
     def run(self):
-        rate = rospy.Rate(50)
+        rate = rospy.Rate(100)
         while not rospy.is_shutdown():
             self.compute_costs()
             rate.sleep()
