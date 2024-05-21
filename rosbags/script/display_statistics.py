@@ -4,9 +4,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-def display_statistics(csv_file):
+def display_statistics(csv_file_path, csv_file):
     # Load the CSV file into a DataFrame
-    df = pd.read_csv(csv_file)
+    df = pd.read_csv(csv_file_path)
     
     # Check if there are at least two columns in the CSV file
     if df.shape[1] < 2:
@@ -51,13 +51,13 @@ def display_statistics(csv_file):
 
     plt.xlabel('Columns')
     plt.ylabel('Values')
-    plt.title('Mean, Standard Deviation, and 98% Confidence Interval of CSV Columns')
+    plt.title("Mean, Standard Deviation, and 98% Confidence Interval of " + os.path.splitext(csv_file)[0])
     plt.xticks(x, columns, rotation=45)
     plt.legend()
     plt.tight_layout()
     
     # Extract directory path from the CSV file path
-    output_directory = os.path.dirname(csv_file)
+    output_directory = os.path.dirname(csv_file_path)
     
     # Save the graph in the same folder as the CSV file
     graph_file = os.path.join(output_directory, 'statistics_plot.png')
@@ -66,12 +66,13 @@ def display_statistics(csv_file):
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:
-        csv_file = f"../bagfiles/speed_norm_idle/speed_norm_idle.csv"
-        display_statistics(csv_file)
+        csv_file = "speed_norm_idle"
+        csv_file_path = f"../bagfiles/speed_norm_idle/speed_norm_idle.csv"
+        display_statistics(csv_file_path, csv_file)
     elif len(sys.argv) == 2:
         bag_file = sys.argv[1]
         default_bag_file_without_extension = os.path.splitext(bag_file)[0]
-        csv_file = f"../bagfiles/{default_bag_file_without_extension}/{default_bag_file_without_extension}.csv"
-        display_statistics(csv_file)
+        csv_file_path = f"../bagfiles/{default_bag_file_without_extension}/{default_bag_file_without_extension}.csv"
+        display_statistics(csv_file_path, default_bag_file_without_extension)
     else:
         print("Usage: python display_statistics.py <csv_file>")

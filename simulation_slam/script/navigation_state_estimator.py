@@ -31,8 +31,8 @@ class NavigationStateNode:
         self.joint_names = ['rear_left_hip', 'rear_right_hip', 'front_left_hip', 'front_right_hip']
         self.current_velocities = {}
         self.transition_speed_threshold = 0.5
-        self.linear_speed_threshold = 0.15
-        self.angular_speed_threshold = 0.1
+        self.linear_speed_threshold = 0.1662    # Mean_linear_speed - STD_linear_speed based on statistics performed on rosbags speed_norm_idle.bag and speed_norm_moving.bag
+        self.angular_speed_threshold = 0.0712     # Mean_angular_speed - STD_angular_speed based on statistics performed on rosbags speed_norm_idle.bag and speed_norm_moving.bag
         self.linear_speed_norm = 0.0
         self.angular_speed_norm = 0.0
 
@@ -64,10 +64,10 @@ class NavigationStateNode:
                 self.is_moving = False
 
             # Check if hips are moving (assuming hip movement => transition)
-            if (self.current_velocities['rear_left_hip'] > self.transition_speed_threshold or
-                self.current_velocities['rear_right_hip'] > self.transition_speed_threshold or
-                self.current_velocities['front_left_hip'] > self.transition_speed_threshold or
-                self.current_velocities['front_right_hip'] > self.transition_speed_threshold):
+            if (abs(self.current_velocities['rear_left_hip']) > self.transition_speed_threshold or
+                abs(self.current_velocities['rear_right_hip']) > self.transition_speed_threshold or
+                abs(self.current_velocities['front_left_hip']) > self.transition_speed_threshold or
+                abs(self.current_velocities['front_right_hip']) > self.transition_speed_threshold):
                 self.is_transitioning = True
             else:
                 self.is_transitioning = False

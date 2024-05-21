@@ -23,6 +23,7 @@ class PowerComputationNode:
         self.pub_cost_crawling = rospy.Publisher('/computed_cost_crawling', Float32, queue_size=10)
         self.pub_cost_transitioning = rospy.Publisher('/computed_cost_transitioning', Float32, queue_size=10)
         self.pub_cost_total = rospy.Publisher('/computed_cost_total', Float32, queue_size=10)
+        self.pub_elapsed_time = rospy.Publisher('/elapsed_time', Float32, queue_size=10)
 
         # Variables
         self.current_mode = None                           # "CRAWLING", "ROLLING", "FLIGHT"
@@ -62,12 +63,15 @@ class PowerComputationNode:
 
                 # Compute time since last mode change
                 elapsed_time = (current_time - self.last_time).to_sec()
+                self.pub_elapsed_time.publish(elapsed_time)
 
                 # Compute and publish energy comsumption per mode: E [J] = P [W] * dT [sec]
                 if self.current_mode == "ROLLING":
                     self.computed_cost_rolling = self.computed_cost_rolling + self.cost_rolling * elapsed_time
                 elif self.current_mode == "CRAWLING":
                     self.computed_cost_crawling = self.computed_cost_crawling + self.cost_crawling * elapsed_time
+
+                self.last_time = rospy.Time.now()
            
             else:
                 # Restart timer until the robot starts moving again to avoid integrating energy when robot is idle 
@@ -89,6 +93,8 @@ class PowerComputationNode:
 
                 # Compute and publish energy comsumption for transitioning: E [J] = P [W] * dT [sec]
                 self.computed_cost_transitioning = self.computed_cost_transitioning + self.cost_transitioning * elapsed_time
+
+                self.last_transitioning_time = rospy.Time.now()
         
             else:
                 # If stopped transitioning, reset the transition state to restart the last_transitioning_time timer
