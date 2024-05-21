@@ -12,49 +12,69 @@ class DynamicTFBroadcaster:
         self.pub_tf = rospy.Publisher("/tf", tf.msg.tfMessage, queue_size=10)
 
         # Listener
-        listener = tf.TransformListener()
+        self.listener = tf.TransformListener()
 
         # Variables
         self.ref_link = "base_link"
-        self.target_link = "rear_right_wheel"
+        self.rear_right_wheel = "rear_right_wheel"
+        self.rear_left_wheel = "rear_left_wheel"
+        self.front_right_wheel = "front_right_wheel"
+        self.front_left_wheel = "front_left_wheel"
         self.m4_ground_holder_tf_z = 0.19
-        self.wheel_radius_transformed = 0.20        # Wheel radius projected on line between base_link and rear_right_wheel link
+        self.wheel_radius_transformed = 0.35        # Length of the extension of the line "base_link to wheel_center" between wheel_center and the ground when the wheel is vertical
 
-        timeout_duration = rospy.Duration(20.0)     # Timeout duration for waiting for ref_link to target_link transform
+        timeout_duration = rospy.Duration(10.0)     # Timeout duration for waiting for ref_link to wheel link transform
 
         # Wait for the transform between the ref_link and target_link to become available
         start_time = rospy.Time.now()
         while not rospy.is_shutdown() and (rospy.Time.now() - start_time) < timeout_duration:
             
             try:
-                listener.waitForTransform(self.ref_link, self.target_link, rospy.Time(), rospy.Duration(1.0))
+                self.listener.waitForTransform(self.ref_link, self.rear_right_wheel, rospy.Time(), rospy.Duration(1.0))
+                self.listener.waitForTransform(self.ref_link, self.rear_left_wheel, rospy.Time(), rospy.Duration(1.0))
+                self.listener.waitForTransform(self.ref_link, self.front_right_wheel, rospy.Time(), rospy.Duration(1.0))
+                self.listener.waitForTransform(self.ref_link, self.front_left_wheel, rospy.Time(), rospy.Duration(1.0))
                 rospy.loginfo("Transform between {} and {} found.".format(self.ref_link, self.target_link))
                 # Exit the loop if transform is found
                 break  
             
             except tf.Exception as ex:
-                rospy.logwarn("Failed to find transform between {} and {}: {}".format(self.ref_link, self.target_link, ex))
+                rospy.logwarn("Failed to find transform between {} and wheels link: {}".format(self.ref_link, ex))
                 # Wait for a short duration before retrying
                 rospy.sleep(0.5)
 
-        # Expect the transform between the ref_link and target_link to be available after timeout
+        # Expect the transform between the ref_link and wheel links to be available after timeout
         while not rospy.is_shutdown():
             
             # Run loop at about 50Hz
             rospy.sleep(0.02)
 
             try:
-                # Get the transform between the two links
-                (trans, rot) = listener.lookupTransform(self.ref_link, self.target_link, rospy.Time(0))
-                rot_x = rot[0]
-                distance_z = -trans[2]  # Z distance between base_link (at center top of robot to right_rear_wheel center)
-                self.compute_ground_contact_transform(distance_z, rot_x)
+ 
+                # Compute separate ground transforms for each wheel 
+                t1 = self.compute_ground_contact_transform(self.rear_right_wheel)
+                t2 = self.compute_ground_contact_transform(self.rear_left_wheel)
+                t3 = self.compute_ground_contact_transform(self.front_right_wheel)
+                t4 = self.compute_ground_contact_transform(self.front_left_wheel)
+
+                # Initialize ground transformation as average distance to ground between base_link and all wheel links
+                t = t1
+                t.transform.translation.z = (t1.transform.translation.z + t2.transform.translation.z + t3.transform.translation.z + t4.transform.translation.z) / 4
+
+                # Publish transform
+                tfm = tf.msg.tfMessage([t])
+                self.pub_tf.publish(tfm)
 
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
                 continue
 
 
-    def compute_ground_contact_transform(self, distance_z, rot_x):
+    def compute_ground_contact_transform(self, wheel_link):
+
+        # Get the transform between the two links
+        (trans, rot) = self.listener.lookupTransform(self.ref_link, wheel_link, rospy.Time(0))
+        rot_x = rot[0]
+        distance_z = -trans[2]  # Z distance between base_link (at center top of robot to right_rear_wheel center)
         
         # Create transform message
         t = geometry_msgs.msg.TransformStamped()
@@ -75,9 +95,8 @@ class DynamicTFBroadcaster:
         if t.transform.translation.z < self.m4_ground_holder_tf_z:
             t.transform.translation.z = self.m4_ground_holder_tf_z
 
-        # Publish transform
-        tfm = tf.msg.tfMessage([t])
-        self.pub_tf.publish(tfm)
+        return t
+
 
             
 if __name__ == '__main__':

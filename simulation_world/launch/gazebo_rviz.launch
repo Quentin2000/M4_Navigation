@@ -76,13 +76,13 @@
 
   <arg name="launch_rviz" default="true" />
   <!-- launch rviz -->
-<group if="$(arg launch_rviz)">
-  <node
-    name="rviz"
-    pkg="rviz"
-    type="rviz"
-    args="-d $(find simulation_world)/rviz/m4_visual.rviz" />
-</group>
+  <group if="$(arg launch_rviz)">
+    <node
+      name="rviz"
+      pkg="rviz"
+      type="rviz"
+      args="-d $(find simulation_world)/rviz/m4_visual.rviz" />
+  </group>
   
      
 </launch>
