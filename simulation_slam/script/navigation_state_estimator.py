@@ -4,6 +4,7 @@ import rospy
 from simulation_slam.msg import NavigationState
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import JointState
+from std_msgs.msg import Float32
 import math
 
 class NavigationStateNode:
@@ -18,6 +19,8 @@ class NavigationStateNode:
 
         # Publishers
         self.pub_nav_state = rospy.Publisher('/nav_state', NavigationState, queue_size=10)
+        self.pub_linear_norm = rospy.Publisher('/speed_norm_linear', Float32, queue_size=10)
+        self.pub_angular_norm = rospy.Publisher('/speed_norm_angular', Float32, queue_size=10)
 
         # Variables
         self.linear_speed = None        # float64 x, float64 y, float64 z
@@ -28,8 +31,10 @@ class NavigationStateNode:
         self.joint_names = ['rear_left_hip', 'rear_right_hip', 'front_left_hip', 'front_right_hip']
         self.current_velocities = {}
         self.transition_speed_threshold = 0.5
-        self.linear_speed_threshold = 0.1
+        self.linear_speed_threshold = 0.15
         self.angular_speed_threshold = 0.1
+        self.linear_speed_norm = 0.0
+        self.angular_speed_norm = 0.0
 
     def joint_states_callback(self, msg):
         # Update the current joint positions
@@ -45,13 +50,15 @@ class NavigationStateNode:
     def estimate_state(self):
         # Wait for Odometry to start
         if (self.linear_speed is not None and self.angular_speed is not None):
-            # Check if robot is moving by computing normal of linear speed and angular speed vectors 
-            if  (math.sqrt( self.linear_speed.x * self.linear_speed.x +
-                            self.linear_speed.y * self.linear_speed.y +
-                            self.linear_speed.z * self.linear_speed.z ) > self.linear_speed_threshold or
-                math.sqrt(  self.angular_speed.x * self.angular_speed.x +
-                            self.angular_speed.y * self.angular_speed.y +
-                            self.angular_speed.z * self.angular_speed.z)  > self.angular_speed_threshold ):
+            # Check if robot is moving by computing normal of linear speed and angular speed vectors
+            self.linear_speed_norm = math.sqrt(  self.linear_speed.x * self.linear_speed.x +
+                                            self.linear_speed.y * self.linear_speed.y +
+                                            self.linear_speed.z * self.linear_speed.z )
+            self.angular_speed_norm = math.sqrt( self.angular_speed.x * self.angular_speed.x +
+                                            self.angular_speed.y * self.angular_speed.y +
+                                            self.angular_speed.z * self.angular_speed.z) 
+
+            if  ( self.linear_speed_norm > self.linear_speed_threshold or self.angular_speed_norm > self.angular_speed_threshold ):
                 self.is_moving = True
             else :
                 self.is_moving = False
@@ -64,6 +71,10 @@ class NavigationStateNode:
                 self.is_transitioning = True
             else:
                 self.is_transitioning = False
+            
+            # Publish speed norms
+            self.pub_linear_norm.publish(self.linear_speed_norm)
+            self.pub_angular_norm.publish(self.angular_speed_norm)                        
 
             # Publish navigation state
             navigation_state = NavigationState()
