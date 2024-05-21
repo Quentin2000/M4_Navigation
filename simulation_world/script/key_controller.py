@@ -28,13 +28,28 @@ class KeyTeleop:
 
 
     def ramp_up_speed(self, target_speed, current_speed):
-        # Increase the current speed gradually up to the target speed
-        if target_speed > current_speed:
-            return min(target_speed, current_speed + self.acceleration)
-        elif target_speed < current_speed:
-            return max(target_speed, current_speed - self.deceleration)
-        else:
-            return target_speed
+
+        if target_speed > 0:
+            if target_speed > current_speed:
+                return min(target_speed, current_speed + self.acceleration)
+            elif target_speed < current_speed:
+                return max(target_speed, current_speed - self.deceleration)
+            else:
+                return target_speed
+        elif target_speed < 0:
+            if current_speed < target_speed :
+                return min(target_speed, current_speed + self.deceleration)
+            elif current_speed > target_speed:
+                return max(target_speed, current_speed - self.acceleration)
+            else:
+                return target_speed
+        else: # target_speed = 0
+            if current_speed < target_speed :
+                return min(target_speed, current_speed + self.deceleration)
+            elif current_speed > target_speed:
+                return max(target_speed, current_speed - self.deceleration)
+            else:
+                return target_speed
 
     # This function is called whenever a key is pressed
     def on_press(self, key):
@@ -74,7 +89,10 @@ class KeyTeleop:
                 self.current_linear_speed = self.ramp_up_speed(0, self.current_linear_speed)
                 twist_msg.linear.x = self.current_linear_speed
                 self.cmd_vel_pub.publish(twist_msg)
-                rospy.sleep(0.1)  # Adjust sleep time as needed
+                rospy.sleep(0.1)
+            self.current_linear_speed = 0
+            twist_msg.linear.x = self.current_linear_speed
+            self.cmd_vel_pub.publish(twist_msg)
 
         if key == keyboard.Key.left or key == keyboard.Key.right:
             # Decelerate angular speed to 0
@@ -82,7 +100,10 @@ class KeyTeleop:
                 self.current_angular_speed = self.ramp_up_speed(0, self.current_angular_speed)
                 twist_msg.angular.z = self.current_angular_speed
                 self.cmd_vel_pub.publish(twist_msg)
-                rospy.sleep(0.1)  # Adjust sleep time as needed
+                rospy.sleep(0.1)
+            self.current_angular_speed = 0
+            twist_msg.angular.z = self.current_angular_speed
+            self.cmd_vel_pub.publish(twist_msg)                       
 
 if __name__ == '__main__':
     try:
