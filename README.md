@@ -15,8 +15,6 @@ The M4 robot is a multimodal platform developed at Caltech for complex terrain e
 - [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Examples](#examples)
-- [Contributing](#contributing)
 - [License](#license)
 - [Contact](#contact)
 
