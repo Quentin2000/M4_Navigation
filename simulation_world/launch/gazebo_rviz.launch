@@ -4,12 +4,11 @@
     textfile="$(find simulation_world)/urdf/m4assembly_low_power_sim.urdf" />
 
   <!-- launch gazebo simulation with empty world -->
-  <!-- <include file="$(find gazebo_ros)/launch/empty_world.launch">
-  </include> -->
+  <!-- <include file="$(find gazebo_ros)/launch/empty_world.launch"/> -->
   
   <!-- launch gazebo simulation with a defined world  -->
   <arg name="gui" default="true"/>
-  <arg name="world_name" default="scenario_4b.world"/>
+  <arg name="world_name" default="terrain_1.world"/>
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" value="$(find simulation_world)/worlds/$(arg world_name)"/>
     <arg name="gui" value="$(arg gui)"/>
@@ -49,9 +48,15 @@
   <!-- launch keyboard controller -->
   <node name="key_controller_node" pkg="simulation_world" type="key_controller.py" output="screen"/>
 
-  <!-- launch robot mode controller node -->
-  <node name="robot_mode_switch" pkg="simulation_world" type="robot_mode_switch.py" output="screen"/>
-    
+  <arg name="rl" default="false"/>
+  <!-- launch robot elevation control nodes (via hip position control)-->
+  <group if="$(arg rl)">
+    <node name="robot_mode_switch_rl" pkg="simulation_world" type="robot_mode_switch_rl.py" output="screen"/>
+  </group>
+  <group unless="$(arg rl)">
+    <node name="robot_mode_switch" pkg="simulation_world" type="robot_mode_switch.py" output="screen"/>
+  </group>
+
   <!--spawn robot in gazebo -->
   <node name="spawn_model" pkg="gazebo_ros" type="spawn_model" 
   args="-file $(find simulation_world)/urdf/m4assembly_low_power_sim.urdf -urdf -x 0.0 -y 0.0 -z 10.0 -model m4assembly" output="screen" />

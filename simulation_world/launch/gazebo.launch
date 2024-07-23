@@ -1,7 +1,7 @@
 <launch>
   <param
     name="robot_description"
-    textfile="$(find simulation_world)/urdf/m4assembly.urdf" />
+    textfile="$(find simulation_world)/urdf/m4assembly_low_power_sim.urdf" />
 
   <!-- launch gazebo simulation with empty world -->
   <!-- <include file="$(find gazebo_ros)/launch/empty_world.launch">
@@ -9,14 +9,14 @@
   
   <!-- launch gazebo simulation with a defined world  -->
   <arg name="gui" default="true"/>
-  <arg name="world_name" default="scenario_1.world"/>
+  <arg name="world_name" default="scenario_4b.world"/>
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" value="$(find simulation_world)/worlds/$(arg world_name)"/>
     <arg name="gui" value="$(arg gui)"/>
     <arg name="paused" value="false"/>
     <arg name="use_sim_time" value="true"/>
     <arg name="headless" value="false"/>
-    <arg name="debug" value="false"/>
+    <arg name="debug" value="true"/>
   </include>
   
   <!-- launch keyboard controller -->

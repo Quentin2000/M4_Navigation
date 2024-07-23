@@ -34,7 +34,6 @@ class DynamicTFBroadcaster:
                 self.listener.waitForTransform(self.ref_link, self.rear_left_wheel, rospy.Time(), rospy.Duration(1.0))
                 self.listener.waitForTransform(self.ref_link, self.front_right_wheel, rospy.Time(), rospy.Duration(1.0))
                 self.listener.waitForTransform(self.ref_link, self.front_left_wheel, rospy.Time(), rospy.Duration(1.0))
-                rospy.loginfo("Transform between {} and {} found.".format(self.ref_link, self.target_link))
                 # Exit the loop if transform is found
                 break  
             
