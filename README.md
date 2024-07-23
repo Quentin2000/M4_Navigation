@@ -57,11 +57,11 @@ This is where the navigation comes alive. This folder includes the navigation mo
 ### Steps
 1. Clone the repository:
     ```sh
-    git clone https://github.com/Quentin2000/M4_Local_Planner.git
+    git clone https://github.com/Quentin2000/M4_Navigation.git
     ```
 2. Navigate to the project directory:
     ```sh
-    cd M4_Local_Planner
+    cd M4_Navigation
     ```
 3. Install the required dependencies:
     ```sh
@@ -71,36 +71,17 @@ This is where the navigation comes alive. This folder includes the navigation mo
 ## Usage
 1. Launch the simulation environment:
     ```sh
-    roslaunch m4_local_planner simulation.launch
+    cd ~catkin_ws/src/M4_Navigation/simulation_world/launch
+    roslaunch gazebo_rviz.launch
     ```
-2. Run the local planner node:
+2. Run the autonomous navigation:
     ```sh
-    rosrun m4_local_planner local_planner_node
+    cd ~catkin_ws/src/M4_Navigation/simulation_slam/launch
+    roslaunch simulation_merged.launch
     ```
-3. Adjust the parameters in `config/local_planner.yaml` to fit your specific use case.
 
 ## Examples
 Here are a few example scenarios to get you started:
-
-### Basic Simulation
-- Launch the basic simulation environment and see the local planner in action:
-    ```sh
-    roslaunch m4_local_planner basic_simulation.launch
-    ```
-
-### Advanced Configuration
-- For more advanced configurations, edit the `config/advanced.yaml` file and launch:
-    ```sh
-    roslaunch m4_local_planner advanced_simulation.launch
-    ```
-
-## Contributing
-Contributions are welcome! Please follow these steps:
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature-branch`).
-3. Commit your changes (`git commit -am 'Add new feature'`).
-4. Push to the branch (`git push origin feature-branch`).
-5. Create a new Pull Request.
 
 ## License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
