@@ -15,15 +15,13 @@ The M4 robot is a multimodal platform developed at Caltech for complex terrain e
 - [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Examples](#examples)
-- [Contributing](#contributing)
 - [License](#license)
 - [Contact](#contact)
 
 
 ## Content
 
-This repository is organized between two main folders:
+This repository is organized around two main folders:
 - simulation_world
 - simulation_slam
 
@@ -79,9 +77,6 @@ This is where the navigation comes alive. This folder includes the navigation mo
     cd ~catkin_ws/src/M4_Navigation/simulation_slam/launch
     roslaunch simulation_merged.launch
     ```
-
-## Examples
-Here are a few example scenarios to get you started:
 
 ## License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
