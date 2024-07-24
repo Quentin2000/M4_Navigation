@@ -116,7 +116,7 @@
       <param name="grid_size_meters"     value="$(arg grid_size_meters)"/>
     </node>
   </group>
-  
+
   <!-- Merge gridmaps -->
   <node name="cost_map_node" pkg="simulation_slam" type="cost_map_node.py" output="screen">
     <param name="input_grid_rolling"      value="/roll_grid_map"/>

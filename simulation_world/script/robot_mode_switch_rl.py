@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
-import numpy as np
-from sensor_msgs.msg import JointState
-from std_msgs.msg import String, Float64, Bool
+from std_msgs.msg import Float64
 from simulation_world.msg import HipPos 
 
 class HipCommander:
@@ -12,7 +10,7 @@ class HipCommander:
 
         # Subscribers
         # rospy.Subscriber('/m4assembly/joint_states', JointState, self.joint_states_callback)
-        rospy.Subscriber('/m4assembly/rl/hip_pos', HipPos, self.command_callback)
+        rospy.Subscriber('rl/hip_pos', HipPos, self.command_callback)
 
         # Variables
         self.current_positions = {}
