@@ -11,7 +11,7 @@
         xyz="0.00014012 -1.2866E-05 -0.067235"
         rpy="0 0 0" />
       <mass
-        value="5.054" />
+        value="1.054" />
       <inertia
         ixx="0.00066925"
         ixy="-1.7138E-07"
@@ -144,7 +144,7 @@
   </link>
   <joint
     name="rear_left_leg_joint"
-    type="fixed">
+    type="revolute">
     <origin
       xyz="0.0611 -0.006895 -5E-05"
       rpy="1.5708 -1.5526 1.5708" />
@@ -162,7 +162,7 @@
         xyz="-1.2835011736767E-06 2.34490590667047E-07 -0.0298825868697071"
         rpy="0 0 0" />
       <mass
-        value="2.0" />
+        value="0.447367748033206" />
       <inertia
         ixx="0.00104268899323013"
         ixy="-3.91603340525233E-08"
@@ -367,7 +367,7 @@
   </link>
   <joint
     name="rear_right_leg_joint"
-    type="fixed">
+    type="revolute">
     <origin
       xyz="0.0611 -0.006895 0"
       rpy="3.1416 1.5708 0" />
@@ -385,7 +385,7 @@
         xyz="-1.78659846361562E-08 -2.01874887645337E-06 0.0255799203790625"
         rpy="0 0 0" />
       <mass
-        value="2.0" />
+        value="0.447367750743676" />
       <inertia
         ixx="0.0010426206896193"
         ixy="-2.73561891555305E-10"
@@ -590,7 +590,7 @@
   </link>
   <joint
     name="front_left_leg_joint"
-    type="fixed">
+    type="revolute">
     <origin
       xyz="0.0611 -0.006895 0.0025144"
       rpy="-1.5708 -1.5708 -1.5708" />
@@ -608,7 +608,7 @@
         xyz="1.77235233511999E-08 -2.01879895370127E-06 -0.0284894545323338"
         rpy="0 0 0" />
       <mass
-        value="2.0" />
+        value="0.447367750292981" />
       <inertia
         ixx="0.00104262069065618"
         ixy="2.74220212176939E-10"
@@ -813,7 +813,7 @@
   </link>
   <joint
     name="front_right_leg_joint"
-    type="fixed">
+    type="revolute">
     <origin
       xyz="0.0611 -0.006895 -0.0021644"
       rpy="1.5708 1.5656 -1.5708" />
@@ -836,7 +836,7 @@
         xyz="1.28310223720821E-06 2.3448596928044E-07 0.0255837574129385"
         rpy="0 0 0" />
       <mass
-        value="2.0" />
+        value="0.447367750640603" />
       <inertia
         ixx="0.00104268899474349"
         ixy="3.91619025865096E-08"
@@ -942,84 +942,7 @@
       velocity="200" />
   </joint>
 
-  <link name="front_realsense">
-    <inertial>
-      <origin xyz="0 0 0" rpy="-1.5707963267948966 0 -1.5707963267948966"/>
-      <mass value="0.05"/>
-      <inertia ixx="1e-6" iyy="1e-6" izz="1e-6" ixy="0" ixz="0" iyz="0"/>
-    </inertial>
-    <visual>
-      <origin xyz="0 0 0" rpy="-1.5707963267948966 0 -1.5707963267948966"/>
-      <geometry>
-        <mesh filename="package://realsense2_description/meshes/d435.dae"/>
-      </geometry>
-    </visual>
-    <collision>
-      <origin xyz="0 0 0" rpy="-1.5707963267948966 0 -1.5707963267948966"/>
-      <geometry>
-        <box size="0.01 0.01 0.01"/>  <!-- Approximate size of the camera -->
-      </geometry>
-    </collision>
-  </link>
-
-  <!--
-    The gazebo plugin aligns the depth data with the Z axis, with X=left and Y=up
-    ROS expects the depth data along the X axis, with Y=left and Z=up
-    This link only exists to give the gazebo plugin the correctly-oriented frame
-  -->
-  <link name="front_realsense_gazebo" />
-  <joint name="front_realsense_gazebo_joint" type="fixed">
-    <parent link="front_realsense"/>
-    <child link="front_realsense_gazebo"/>
-    <origin xyz="0.0 0 0" rpy="-1.5707963267948966 0 -1.5707963267948966"/>
-  </joint>
-
-  <gazebo reference="front_realsense">
-    <turnGravityOff>true</turnGravityOff>
-    <sensor type="depth" name="front_realsense_depth">
-      <update_rate>30</update_rate>
-      <camera>
-        <!-- 75x65 degree FOV for the depth sensor -->
-        <horizontal_fov>1.5184351666666667</horizontal_fov>
-        <vertical_fov>1.0122901111111111</vertical_fov>
-
-        <image>
-          <width>640</width>
-          <height>480</height>
-          <format>R8G8B8</format>
-        </image>
-        <clip>
-          <!-- give the color sensor a maximum range of 50m so that the simulation renders nicely -->
-          <near>0.01</near>
-          <far>10.0</far>
-        </clip>
-      </camera>
-      <plugin name="kinect_controller" filename="libgazebo_ros_openni_kinect.so">
-        <baseline>0.2</baseline>
-        <alwaysOn>true</alwaysOn>
-        <updateRate>30</updateRate>
-        <cameraName>realsense</cameraName>
-        <imageTopicName>color/image_raw</imageTopicName>
-        <cameraInfoTopicName>color/camera_info</cameraInfoTopicName>
-        <depthImageTopicName>depth/image_rect_raw</depthImageTopicName>
-        <depthImageInfoTopicName>depth/camera_info</depthImageInfoTopicName>
-        <pointCloudTopicName>depth/color/points</pointCloudTopicName>
-        <frameName>front_realsense_gazebo</frameName>
-        <pointCloudCutoff>0.105</pointCloudCutoff>
-        <pointCloudCutoffMax>5.0</pointCloudCutoffMax>
-        <distortionK1>0.00000001</distortionK1>
-        <distortionK2>0.00000001</distortionK2>
-        <distortionK3>0.00000001</distortionK3>
-        <distortionT1>0.00000001</distortionT1>
-        <distortionT2>0.00000001</distortionT2>
-        <CxPrime>0</CxPrime>
-        <Cx>0</Cx>
-        <Cy>0</Cy>
-        <focalLength>0</focalLength>
-        <hackBaseline>0</hackBaseline>
-      </plugin>
-    </sensor>
-  </gazebo>
+    <link name="front_realsense" />Z
 
   <link name="front_realsense_lens">
     <visual>
@@ -1046,259 +969,5 @@
     <parent link="front_realsense_lens" />
     <child link="front_realsense" />
   </joint>
-  
-  <link name="rear_realsense">   
-    <inertial>
-      <origin xyz="0 0 0" rpy="-1.5707963267948966 0 -1.5707963267948966"/>
-      <mass value="0.05"/>
-      <inertia ixx="1e-6" iyy="1e-6" izz="1e-6" ixy="0" ixz="0" iyz="0"/>
-    </inertial>
-    <visual>
-      <origin xyz="0 0 0" rpy="-1.5707963267948966 0 -1.5707963267948966"/>
-      <geometry>
-        <mesh filename="package://realsense2_description/meshes/d435.dae"/>
-      </geometry>
-    </visual>
-    <collision>
-      <origin xyz="0 0 0" rpy="-1.5707963267948966 0 -1.5707963267948966"/>
-      <geometry>
-        <box size="0.01 0.01 0.01"/>  <!-- Approximate size of the camera -->
-      </geometry>
-    </collision>
-  </link>
-
-  <!--
-    The gazebo plugin aligns the depth data with the Z axis, with X=left and Y=up
-    ROS expects the depth data along the X axis, with Y=left and Z=up
-    This link only exists to give the gazebo plugin the correctly-oriented frame
-  -->
-  <link name="rear_realsense_gazebo" />
-  <joint name="rear_realsense_gazebo_joint" type="fixed">
-    <parent link="rear_realsense"/>
-    <child link="rear_realsense_gazebo"/>
-    <origin xyz="0.0 0 0" rpy="-1.5707963267948966 0 -1.5707963267948966"/>
-  </joint>
-
-  <gazebo reference="rear_realsense">
-    <turnGravityOff>true</turnGravityOff>
-    <sensor type="depth" name="rear_realsense_depth">
-      <update_rate>30</update_rate>
-      <camera>
-        <!-- 75x65 degree FOV for the depth sensor -->
-        <horizontal_fov>1.5184351666666667</horizontal_fov>
-        <vertical_fov>1.0122901111111111</vertical_fov>
-
-        <image>
-          <width>640</width>
-          <height>480</height>
-          <format>R8G8B8</format>
-        </image>
-        <clip>
-          <!-- give the color sensor a maximum range of 50m so that the simulation renders nicely -->
-          <near>0.01</near>
-          <far>10.0</far>
-        </clip>
-      </camera>
-      <plugin name="kinect_controller" filename="libgazebo_ros_openni_kinect.so">
-        <baseline>0.2</baseline>
-        <alwaysOn>true</alwaysOn>
-        <updateRate>30</updateRate>
-        <cameraName>realsense2</cameraName>
-        <imageTopicName>color/image_raw</imageTopicName>
-        <cameraInfoTopicName>color/camera_info</cameraInfoTopicName>
-        <depthImageTopicName>depth/image_rect_raw</depthImageTopicName>
-        <depthImageInfoTopicName>depth/camera_info</depthImageInfoTopicName>
-        <pointCloudTopicName>depth/color/points</pointCloudTopicName>
-        <frameName>rear_realsense_gazebo</frameName>
-        <pointCloudCutoff>0.105</pointCloudCutoff>
-        <pointCloudCutoffMax>5.0</pointCloudCutoffMax>
-        <distortionK1>0.00000001</distortionK1>
-        <distortionK2>0.00000001</distortionK2>
-        <distortionK3>0.00000001</distortionK3>
-        <distortionT1>0.00000001</distortionT1>
-        <distortionT2>0.00000001</distortionT2>
-        <CxPrime>0</CxPrime>
-        <Cx>0</Cx>
-        <Cy>0</Cy>
-        <focalLength>0</focalLength>
-        <hackBaseline>0</hackBaseline>
-      </plugin>
-    </sensor>
-  </gazebo>
-
-  <link name="rear_realsense_lens">
-    <visual>
-      <origin xyz="0.02 0 0" rpy="1.5707963267948966 0 1.5707963267948966" />
-      <geometry>
-        <mesh filename="package://realsense2_description/meshes/d435.dae" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.75294 0.75294 0.75294 1" />
-      </material>
-    </visual>
-  </link>
-
-  <joint type="fixed" name="rear_realsense_lens_joint">
-    <!-- Offset the camera 2cm backwards and 1cm up -->
-    <origin xyz="-0.24099 0 0" rpy="0 0 3.1415926535897932384626433" />
-    <parent link="base_link" />
-    <child link="rear_realsense_lens" />
-  </joint>
-  <joint type="fixed" name="rear_realsense_joint">
-    <origin xyz="0.025 0 0" rpy="0 0 0" />
-    <parent link="rear_realsense_lens" />
-    <child link="rear_realsense" />
-  </joint>
-
-
-  <gazebo> 
-    <plugin name="p3d_base_controller" filename="libgazebo_ros_p3d.so">
-    <alwaysOn>true</alwaysOn>
-    <updateRate>50.0</updateRate>
-    <bodyName>base_link</bodyName>
-    <topicName>my_odom</topicName>
-    <gaussianNoise>0.01</gaussianNoise>
-    <frameName>world</frameName>
-    <xyzOffsets>0 0 0</xyzOffsets>
-    <rpyOffsets>0 0 0</rpyOffsets>
-    </plugin>
-  </gazebo>
-
-<!-- ROS Control plugin for Gazebo -->
-  <gazebo>
-    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
-      <robotNamespace>/m4assembly</robotNamespace>
-    </plugin>
-  </gazebo>
-
-  <gazebo>
-    <plugin name="gazebo_ros_joint_state_publisher" filename="libgazebo_ros_joint_state_publisher.so">
-      <update_rate>20</update_rate>
-      <joint_name>front_right_wheel_joint</joint_name>
-    </plugin>
-  </gazebo>
-
-  <!-- transmission -->
-  <transmission name="rl_hip_trans">
-    <type>transmission_interface/SimpleTransmission</type>
-    <actuator name="motor1">
-      <mechanicalReduction>1</mechanicalReduction>
-    </actuator>
-    <joint name="rear_left_hip_joint">
-      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-    </joint>
-  </transmission>
-
-  <transmission name="rl_wheel_trans">
-    <type>transmission_interface/SimpleTransmission</type>
-    <actuator name="motor3">
-      <mechanicalReduction>1</mechanicalReduction>
-    </actuator>
-    <joint name="rear_left_wheel_joint">
-      <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
-    </joint>
-  </transmission>
-
-  <transmission name="rl_blade_trans">
-    <type>transmission_interface/SimpleTransmission</type>
-    <actuator name="motor4">
-      <mechanicalReduction>1</mechanicalReduction>
-    </actuator>
-    <joint name="rear_left_blade_joint">
-      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-    </joint>
-  </transmission>
-
-  <transmission name="rr_hip_trans">
-    <type>transmission_interface/SimpleTransmission</type>
-    <actuator name="motor5">
-      <mechanicalReduction>1</mechanicalReduction>
-    </actuator>
-    <joint name="rear_right_hip_joint">
-      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-    </joint>
-  </transmission>
-
-  <transmission name="rr_wheel_trans">
-    <type>transmission_interface/SimpleTransmission</type>
-    <actuator name="motor7">
-      <mechanicalReduction>1</mechanicalReduction>
-    </actuator>
-    <joint name="rear_right_wheel_joint">
-      <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
-    </joint>
-  </transmission>
-
-  <transmission name="rr_blade_trans">
-    <type>transmission_interface/SimpleTransmission</type>
-    <actuator name="motor8">
-      <mechanicalReduction>1</mechanicalReduction>
-    </actuator>
-    <joint name="rear_right_blade_joint">
-      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-    </joint>
-  </transmission>
-
-  <transmission name="fl_hip_trans">
-    <type>transmission_interface/SimpleTransmission</type>
-    <actuator name="motor9">
-      <mechanicalReduction>1</mechanicalReduction>
-    </actuator>
-    <joint name="front_left_hip_joint">
-      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-    </joint>
-  </transmission>
-
-  <transmission name="fl_wheel_trans">
-    <type>transmission_interface/SimpleTransmission</type>
-    <actuator name="motor11">
-      <mechanicalReduction>1</mechanicalReduction>
-    </actuator>
-    <joint name="front_left_wheel_joint">
-      <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
-    </joint>
-  </transmission>
-
-  <transmission name="fl_blade_trans">
-    <type>transmission_interface/SimpleTransmission</type>
-    <actuator name="motor12">
-      <mechanicalReduction>1</mechanicalReduction>
-    </actuator>
-    <joint name="front_left_blade_joint">
-      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-    </joint>
-  </transmission>
-
-  <transmission name="fr_hip_trans">
-    <type>transmission_interface/SimpleTransmission</type>
-    <actuator name="motor13">
-      <mechanicalReduction>1</mechanicalReduction>
-    </actuator>
-    <joint name="front_right_hip_joint">
-      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-    </joint>
-  </transmission>
-
-  <transmission name="fr_wheel_trans">
-    <type>transmission_interface/SimpleTransmission</type>
-    <actuator name="motor15">
-      <mechanicalReduction>1</mechanicalReduction>
-    </actuator>
-    <joint name="front_right_wheel_joint">
-      <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
-    </joint>
-  </transmission>
-
-  <transmission name="fr_blade_trans">
-    <type>transmission_interface/SimpleTransmission</type>
-    <actuator name="motor16">
-      <mechanicalReduction>1</mechanicalReduction>
-    </actuator>
-    <joint name="front_right_blade_joint">
-      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-    </joint>
-  </transmission>
 
 </robot>

@@ -5,7 +5,7 @@
   <!-- Load Gazebo world -->
   <include file="$(find simulation_world)/launch/gazebo_rviz.launch">
     <arg name="launch_rviz" value="false"/>
-    <arg name="world_name"  value="scenario_4b.world"/>
+    <arg name="world_name"  value="parkour_3.world"/>
     <arg name="publish_static_footprint_tf" value="false"/>
   </include>
 
@@ -20,8 +20,8 @@
   <arg name="proj_max_ground_angle"     default="15"/>
   <arg name="proj_max_ground_height"    default="0.1"/>
   <arg name="proj_max_height_default"   default="1.2"/>
-  <arg name="proj_max_height_rolling"   default="0.5"/>
-  <arg name="proj_max_height_crawling"  default="0.3"/>
+  <arg name="proj_max_height_rolling"   default="0.32"/>
+  <arg name="proj_max_height_crawling"  default="0.26"/>
 
   <!-- Grid parameters -->
   <arg name="use_dual_map_msg"          default="true"/>

@@ -11,7 +11,7 @@
   
   <!-- launch gazebo simulation with a defined world  -->
   <arg name="gui" default="true"/>
-  <arg name="world_name" default="terrain_1.world"/>
+  <arg name="world_name" default="parkour_4.world"/>
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" value="$(find simulation_world)/worlds/$(arg world_name)"/>
     <arg name="gui" value="$(arg gui)"/>
@@ -51,7 +51,7 @@
   <!-- launch keyboard controller -->
   <node name="key_controller_node" pkg="simulation_world" type="key_controller.py" output="screen"/>
 
-  <arg name="rl" default="false"/>
+  <arg name="rl" default="true"/>
   <!-- launch robot elevation control nodes (via hip position control)-->
   <group if="$(arg rl)">
     <node name="rl_controller" pkg="simulation_slam" type="rl_controller.py" output="screen"/>
@@ -62,8 +62,9 @@
   </group>
 
   <!--spawn robot in gazebo -->
-  <node name="spawn_model" pkg="gazebo_ros" type="spawn_model" 
-  args="-file $(find simulation_world)/urdf/$(arg urdf_model) -urdf -x 0.0 -y 0.0 -z 10.0 -model m4assembly" output="screen" />
+  <node name="spawn_model" pkg="gazebo_ros" type="spawn_model"
+  args="-file $(find simulation_world)/urdf/$(arg urdf_model) -urdf -x 0.0 -y 0.0 -z 0.4 -Y 0.0 -model m4assembly" output="screen" />
+
 
   <!-- load the controllers -->
   <rosparam file="$(find simulation_world)/config/controller_config.yaml" command="load"/>
@@ -90,7 +91,7 @@
       name="rviz"
       pkg="rviz"
       type="rviz"
-      args="-d $(find simulation_world)/rviz/m4_visual.rviz" />
+      args="-d $(find simulation_world)/rviz/m4_visual_2.rviz" />
   </group>
      
 </launch>

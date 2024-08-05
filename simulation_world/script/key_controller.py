@@ -1,109 +1,80 @@
-#!/usr/bin/env python
-
 import rospy
 from geometry_msgs.msg import Twist
 from pynput import keyboard
 import time
+import threading
 
 class KeyTeleop:
     def __init__(self):
         rospy.init_node('key_controller_node')
-
-        # Start the keyboard listener
-        self.listener = keyboard.Listener(on_press=self.on_press, on_release=self.on_release)
-        self.listener.start()
-
-        # Publisher
         self.cmd_vel_pub = rospy.Publisher('/m4assembly/wheel_velocity_controller/cmd_vel', Twist, queue_size=10)
 
-        # Variables
-        self.max_linear_speed = 0.5         # Adjust as needed
-        self.max_angular_speed = 2.0        # Adjust as needed
-        self.acceleration = 0.2             # Adjust as needed
-        self.deceleration = 1.0             # Adjust as needed
+        self.max_linear_speed = 0.3
+        self.max_angular_speed = 2.0
         self.current_linear_speed = 0.0
         self.current_angular_speed = 0.0
-        self.last_key_press_time = 0.0
-        self.key_press_interval = 0.1       # Adjust as needed (in seconds)
+        self.key_state = {
+            "up": False,
+            "down": False,
+            "left": False,
+            "right": False
+        }
 
+        # Start the keyboard listener
+        listener = keyboard.Listener(on_press=self.on_press, on_release=self.on_release)
+        listener.start()
 
-    def ramp_up_speed(self, target_speed, current_speed):
+        # Start the command thread
+        self.running = True
+        self.command_thread = threading.Thread(target=self.send_continuous_commands)
+        self.command_thread.start()
 
-        if target_speed > 0:
-            if target_speed > current_speed:
-                return min(target_speed, current_speed + self.acceleration)
-            elif target_speed < current_speed:
-                return max(target_speed, current_speed - self.deceleration)
+    def send_continuous_commands(self):
+        rate = rospy.Rate(10)  # 10 Hz
+        while not rospy.is_shutdown() and self.running:
+            twist_msg = Twist()
+            if self.key_state["up"]:
+                self.current_linear_speed = self.max_linear_speed
+            elif self.key_state["down"]:
+                self.current_linear_speed = -self.max_linear_speed
             else:
-                return target_speed
-        elif target_speed < 0:
-            if current_speed < target_speed :
-                return min(target_speed, current_speed + self.deceleration)
-            elif current_speed > target_speed:
-                return max(target_speed, current_speed - self.acceleration)
+                self.current_linear_speed = 0
+
+            if self.key_state["left"]:
+                self.current_angular_speed = self.max_angular_speed
+            elif self.key_state["right"]:
+                self.current_angular_speed = -self.max_angular_speed
             else:
-                return target_speed
-        else: # target_speed = 0
-            if current_speed < target_speed :
-                return min(target_speed, current_speed + self.deceleration)
-            elif current_speed > target_speed:
-                return max(target_speed, current_speed - self.deceleration)
-            else:
-                return target_speed
+                self.current_angular_speed = 0
 
-    # This function is called whenever a key is pressed
-    def on_press(self, key):
-
-        # Add debouncing of keyboard
-        current_time = time.time()
-        if current_time - self.last_key_press_time < self.key_press_interval:
-            return
-        
-        twist_msg = Twist()
-
-        if key == keyboard.Key.up:
-            self.current_linear_speed = self.ramp_up_speed(self.max_linear_speed, self.current_linear_speed)
             twist_msg.linear.x = self.current_linear_speed
-        elif key == keyboard.Key.down:
-            self.current_linear_speed = self.ramp_up_speed(-self.max_linear_speed, self.current_linear_speed)
-            twist_msg.linear.x = self.current_linear_speed
-        if key == keyboard.Key.left:
-            self.current_angular_speed = self.ramp_up_speed(self.max_angular_speed, self.current_angular_speed)
             twist_msg.angular.z = self.current_angular_speed
-        elif key == keyboard.Key.right:
-            self.current_angular_speed = self.ramp_up_speed(-self.max_angular_speed, self.current_angular_speed)
-            twist_msg.angular.z = self.current_angular_speed
-
-        # Publish the Twist message
-        self.cmd_vel_pub.publish(twist_msg)
-        self.last_key_press_time = current_time
-
-    # This function is called whenever a key is released
-    def on_release(self, key):
-        
-        twist_msg = Twist()
-
-        if key == keyboard.Key.up or key == keyboard.Key.down:
-            # Decelerate linear speed to 0
-            while abs(self.current_linear_speed) > 0.1:
-                self.current_linear_speed = self.ramp_up_speed(0, self.current_linear_speed)
-                twist_msg.linear.x = self.current_linear_speed
-                self.cmd_vel_pub.publish(twist_msg)
-                rospy.sleep(0.1)
-            self.current_linear_speed = 0
-            twist_msg.linear.x = self.current_linear_speed
             self.cmd_vel_pub.publish(twist_msg)
+            rate.sleep()
 
-        if key == keyboard.Key.left or key == keyboard.Key.right:
-            # Decelerate angular speed to 0
-            while abs(self.current_angular_speed) > 0.1:
-                self.current_angular_speed = self.ramp_up_speed(0, self.current_angular_speed)
-                twist_msg.angular.z = self.current_angular_speed
-                self.cmd_vel_pub.publish(twist_msg)
-                rospy.sleep(0.1)
-            self.current_angular_speed = 0
-            twist_msg.angular.z = self.current_angular_speed
-            self.cmd_vel_pub.publish(twist_msg)                       
+    def on_press(self, key):
+        if key == keyboard.Key.up:
+            self.key_state["up"] = True
+        elif key == keyboard.Key.down:
+            self.key_state["down"] = True
+        elif key == keyboard.Key.left:
+            self.key_state["left"] = True
+        elif key == keyboard.Key.right:
+            self.key_state["right"] = True
+
+    def on_release(self, key):
+        if key == keyboard.Key.up:
+            self.key_state["up"] = False
+        elif key == keyboard.Key.down:
+            self.key_state["down"] = False
+        elif key == keyboard.Key.left:
+            self.key_state["left"] = False
+        elif key == keyboard.Key.right:
+            self.key_state["right"] = False
+
+    def __del__(self):
+        self.running = False
+        self.command_thread.join()
 
 if __name__ == '__main__':
     try:
