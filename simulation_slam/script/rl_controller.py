@@ -58,6 +58,9 @@ class ModelInferenceNode:
     def __init__(self):
         rospy.init_node('rl_controller')
 
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        print(f"Using device: {self.device}")
+
         self.filtered_output = None
         self.filtered_front_command = None
         self.filtered_rear_command = None
@@ -72,8 +75,10 @@ class ModelInferenceNode:
         # state_dict = torch.load('/home/m4/IsaacLab/logs/rl_games/m4_cnn/CNN19/nn/m4_cnn.pth') # BEST
         # state_dict = torch.load('/home/m4/IsaacLab/logs/rl_games/m4_cnn/CNN19/nn/last_m4_cnn_ep_315_rew_-4499.462.pth') # COULD WORK
         # state_dict = torch.load('/home/m4/IsaacLab/logs/rl_games/m4_cnn/CNN19/nn/last_m4_cnn_ep_390_rew_-4534.2935.pth')
+        # state_dict = torch.load('/home/m4/IsaacLab/logs/rl_games/m4_cnn/CNN19/nn/last_m4_cnn_ep_205_rew_-5253.5923.pth')
         # state_dict = torch.load('/home/m4/IsaacLab/logs/rl_games/m4_cnn/CNN19/nn/last_m4_cnn_ep_125_rew_-5923.9536.pth')
         state_dict = torch.load('/home/m4/IsaacLab/logs/rl_games/m4_cnn/CNN19/nn/last_m4_cnn_ep_170_rew_-5382.9204.pth') # Very stable under obstacles (with sigma check), would be the BEST if filter added when not crawling
+        # state_dict = torch.load('/home/m4/IsaacLab/logs/rl_games/m4_cnn/CNN19/nn/last_m4_cnn_ep_255_rew_-4889.1235.pth')
         # state_dict = torch.load('/home/m4/IsaacLab/logs/rl_games/m4_cnn/CNN18/nn/last_m4_cnn_ep_190_rew_-5114.941.pth')
         # state_dict = torch.load('/home/m4/IsaacLab/logs/rl_games/m4_cnn/CNN16/nn/last_m4_cnn_ep_260_rew_-6527.487.pth') # No0t so bad wihout the sigma
         
@@ -101,6 +106,7 @@ class ModelInferenceNode:
         output_dim = state_dict['a2c_network.mu.weight'].shape[0]
 
         self.model = DualCameraResnetModel(output_dim=output_dim)
+        self.model.to(self.device)
 
         keys_str = str(list(state_dict.keys()))
         rospy.logwarn("State dict keys: " + keys_str)
@@ -148,30 +154,15 @@ class ModelInferenceNode:
     def process_image(self, msg):
         try:
             cv_image = self.bridge.imgmsg_to_cv2(msg, "32FC1")
-            # rospy.logwarn("Image Shape: ", cv_image.shape)
             cv_image[cv_image > 6.0] = 6.0
             cv_image[np.isinf(cv_image)] = 6.0
             cv_image[np.isnan(cv_image)] = 6.0
 
-            # mask = (cv_image < 6.0)  # Create a mask to only modify values less than 6.0
-            # cv_image[mask] = np.maximum(cv_image[mask] - 0.3, 0.01)
-
             cv_image = cv_image / 6.0
-            # rospy.loginfo(f"Image: {cv_image}")
             cv_image_3c = cv2.merge([cv_image, cv_image, cv_image])
-            # print("Image Shape: ", cv_image_3c.shape)
-            # rospy.loginfo(f"Image: {cv_image_3c}")
-            # rospy.loginfo(f"Image shape: {cv_image_3c.shape}")
-            
-            # Logging images for debug
-            # timestamp = time.strftime("%Y%m%d-%H%M%S")
-            # processed_img_path = os.path.join('/home/m4/Downloads/ros_cam_images', f'processed_image_{timestamp}.png')
-            # cv2.imwrite(processed_img_path, cv_image_3c * 255)  # Converting back to 0-255 scale for saving
 
             # apply transform
-            image_tensor = self.transform(cv_image_3c).unsqueeze(0)
-            # rospy.loginfo(f"Image tensor: {image_tensor}")
-            # rospy.loginfo(f"Image tensor shape: {image_tensor.shape}")
+            image_tensor = self.transform(cv_image_3c).unsqueeze(0).to(self.device)
 
             return image_tensor
         except CvBridgeError as e:
@@ -187,9 +178,6 @@ class ModelInferenceNode:
             rospy.loginfo(f"Hip control: {output}")
             rospy.logwarn(f"Standard Deviation (sigma) output: {sigma}")
 
-            # output = output * 0.5
-            # output = torch.clamp(output, min=0.0, max=0.6)
-
             # Apply low-pass filter
             if self.filtered_output is None:
                 self.filtered_output = output
@@ -197,11 +185,9 @@ class ModelInferenceNode:
                 self.filtered_output = self.alpha * output + (1 - self.alpha) * self.filtered_output
                 output = self.filtered_output
 
-            # Prepare the HipPos message
-            
-
             # Check if the output tensor has only one element and replicate it
             if output.numel() == 1:
+
                 value = torch.clamp(output[0, 0], min=0.0, max=1.0).item().item()
                 self.hip_pos_msg.FL_hip = value
                 self.hip_pos_msg.FR_hip = value
@@ -209,24 +195,7 @@ class ModelInferenceNode:
                 self.hip_pos_msg.RR_hip = value
             
             elif output.numel() == 2:
-                # TEST 1
-                # front_command = torch.clamp(output[0, 0], min=0.0, max=1.0).item()
-                # rear_command = torch.clamp(output[0, 1], min=0.0, max=1.0).item()
-                # command = max(front_command, rear_command)
-                # self.hip_pos_msg.FL_hip = command
-                # self.hip_pos_msg.FR_hip = command
-                # self.hip_pos_msg.RL_hip = command
-                # self.hip_pos_msg.RR_hip = command
 
-                # TEST 2
-                # if sigma[0,0] < 1.0:
-                #     self.hip_pos_msg.FL_hip = torch.clamp(output[0, 0], min=0.0, max=1.0).item()
-                #     self.hip_pos_msg.FR_hip = torch.clamp(output[0, 0], min=0.0, max=1.0).item()
-                # if sigma[0,1] < 1.0:
-                #     self.hip_pos_msg.RL_hip = torch.clamp(output[0, 1], min=0.0, max=1.0).item()
-                #     self.hip_pos_msg.RR_hip = torch.clamp(output[0, 1], min=0.0, max=1.0).item()
-
-                # TEST 3
                 front_command = torch.clamp(output[0, 0], min=0.0, max=0.7).item()
                 rear_command = torch.clamp(output[0, 1], min=0.0, max=0.7).item()
                 self.hip_pos_msg.FL_hip = front_command
@@ -236,74 +205,22 @@ class ModelInferenceNode:
 
 
             elif output.numel() == 4:
-                # TEST 1
-                # Assuming output is already of shape [1, 4] or similar
-                # self.hip_pos_msg.FL_hip = torch.clamp(output[0, 1], min=-0.6, max=0.0).item() * -1
-                # self.hip_pos_msg.FR_hip = torch.clamp(output[0, 2], min=0.0, max=0.6).item()
-                # self.hip_pos_msg.RL_hip = torch.clamp(output[0, 0], min=-0.6, max=0.0).item() * -1
-                # self.hip_pos_msg.RR_hip = torch.clamp(output[0, 3], min=0.0, max=0.6).item()
 
-                # TEST 2
-                # if sigma[0,0] < 1.0:
-                #     self.hip_pos_msg.FL_hip = torch.clamp(output[0, 0], min=0.0, max=1.0).item()
-                # if sigma[0,1] < 1.0:
-                #     self.hip_pos_msg.FR_hip = torch.clamp(output[0, 1], min=0.0, max=1.0).item()
-                # if sigma[0,2] < 1.0:
-                #     self.hip_pos_msg.RL_hip = torch.clamp(output[0, 2], min=0.0, max=1.0).item()
-                # if sigma[0,3] < 1.0:
-                #     self.hip_pos_msg.RR_hip = torch.clamp(output[0, 3], min=0.0, max=1.0).item()
+                max_clamp = 1.0
+                front_command = max(torch.clamp(output[0, 0], min=0.0, max=max_clamp).item(), torch.clamp(output[0, 1], min=0.0, max=max_clamp).item())
+                rear_command = max(torch.clamp(output[0, 2], min=0.0, max=max_clamp).item(), torch.clamp(output[0, 3], min=0.0, max=max_clamp).item())
 
-                # TEST 3
-                # if abs(hip_pos_msg.RR_hip - hip_pos_msg.RL_hip) > 0.01:
-                #     self.hip_pos_msg.RL_hip = (hip_pos_msg.RR_hip + hip_pos_msg.RL_hip) / 2
-                #     self.hip_pos_msg.RR_hip = (hip_pos_msg.RR_hip + hip_pos_msg.RL_hip) / 2
-
-                # if abs(hip_pos_msg.FR_hip - hip_pos_msg.FL_hip) > 0.01:
-                #     self.hip_pos_msg.FL_hip = (hip_pos_msg.FR_hip + hip_pos_msg.FL_hip) / 2
-                #     self.hip_pos_msg.FR_hip = (hip_pos_msg.FR_hip + hip_pos_msg.FL_hip) / 2
-
-                # TEST 4
-                # front_command = max(torch.clamp(output[0, 0], min=0.0, max=0.7).item(), torch.clamp(output[0, 1], min=0.0, max=0.7).item())
-                # rear_command = max(torch.clamp(output[0, 2], min=0.0, max=0.7).item(), torch.clamp(output[0, 3], min=0.0, max=0.7).item())
-                # self.hip_pos_msg.FL_hip = front_command
-                # self.hip_pos_msg.FR_hip = front_command
-                # self.hip_pos_msg.RL_hip = rear_command
-                # self.hip_pos_msg.RR_hip = rear_command
-
-                # TEST 5
-                front_command = max(torch.clamp(output[0, 0], min=0.0, max=0.7).item(), torch.clamp(output[0, 1], min=0.0, max=0.7).item())
-                rear_command = max(torch.clamp(output[0, 2], min=0.0, max=0.7).item(), torch.clamp(output[0, 3], min=0.0, max=0.7).item())
+                front_command = front_command * 0.7
+                rear_command = rear_command * 0.7
                 
-                if (sigma[0,0] < 1.3 or sigma[0,1] < 1.3): 
+                max_sigma = 1.0
+                if (sigma[0,0] < max_sigma or sigma[0,1] < max_sigma): 
                     self.hip_pos_msg.FL_hip = front_command
                     self.hip_pos_msg.FR_hip = front_command
                 
-                if (sigma[0,2] < 1.3 or sigma[0,3] < 1.3):
+                if (sigma[0,2] < max_sigma or sigma[0,3] < max_sigma):
                     self.hip_pos_msg.RL_hip = rear_command
                     self.hip_pos_msg.RR_hip = rear_command
-
-                # TEST 6
-                # front_command = torch.max(torch.clamp(output[0, :2], min=0.0, max=0.7))
-                # rear_command = torch.max(torch.clamp(output[0, 2:4], min=0.0, max=0.7))
-                
-                # if (sigma[0,0] < 1.0 or sigma[0,1] < 1.0):
-                    
-                #     if self.filtered_front_command is None:
-                #         self.filtered_front_command = front_command
-                #     else:
-                #         self.filtered_front_command = self.alpha * front_command + (1 - self.alpha) * self.filtered_front_command
-                    
-                #     self.hip_pos_msg.FL_hip = self.filtered_front_command
-                #     self.hip_pos_msg.FR_hip = self.filtered_front_command
-                
-                # if (sigma[0,2] < 1.0 or sigma[0,3] < 1.0):
-                #     if self.filtered_rear_command is None:
-                #         self.filtered_rear_command = rear_command
-                #     else:
-                #         self.filtered_rear_command = self.alpha * rear_command + (1 - self.alpha) * self.filtered_rear_command
-                    
-                #     self.hip_pos_msg.RL_hip = self.filtered_rear_command
-                #     self.hip_pos_msg.RR_hip = self.filtered_rear_command
 
 
             rospy.loginfo("Publishing HipPos message: FL_hip={}, FR_hip={}, RL_hip={}, RR_hip={}".format(

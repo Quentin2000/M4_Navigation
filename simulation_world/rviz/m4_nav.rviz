@@ -195,6 +195,18 @@ Visualization Manager:
       Value: true
     - Class: rviz/Image
       Enabled: true
+      Image Topic: /realsense2/depth/image_rect_raw
+      Max Value: 6
+      Median window: 5
+      Min Value: 0
+      Name: Image
+      Normalize Range: true
+      Queue Size: 2
+      Transport Hint: raw
+      Unreliable: false
+      Value: true
+    - Class: rviz/Image
+      Enabled: true
       Image Topic: /realsense/color/image_raw
       Max Value: 1
       Median window: 5

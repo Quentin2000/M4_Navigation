@@ -26,6 +26,7 @@ class KeyTeleop:
 
         # Start the command thread
         self.running = True
+        self.send_command = False
         self.command_thread = threading.Thread(target=self.send_continuous_commands)
         self.command_thread.start()
 
@@ -33,23 +34,29 @@ class KeyTeleop:
         rate = rospy.Rate(10)  # 10 Hz
         while not rospy.is_shutdown() and self.running:
             twist_msg = Twist()
+            self.send_command = False
+            self.current_linear_speed = 0
+            self.current_angular_speed = 0
+
             if self.key_state["up"]:
                 self.current_linear_speed = self.max_linear_speed
+                self.send_command = True
             elif self.key_state["down"]:
                 self.current_linear_speed = -self.max_linear_speed
-            else:
-                self.current_linear_speed = 0
+                self.send_command = True
 
             if self.key_state["left"]:
                 self.current_angular_speed = self.max_angular_speed
+                self.send_command = True
             elif self.key_state["right"]:
                 self.current_angular_speed = -self.max_angular_speed
-            else:
-                self.current_angular_speed = 0
+                self.send_command = True
 
-            twist_msg.linear.x = self.current_linear_speed
-            twist_msg.angular.z = self.current_angular_speed
-            self.cmd_vel_pub.publish(twist_msg)
+            if self.send_command:
+                twist_msg.linear.x = self.current_linear_speed
+                twist_msg.angular.z = self.current_angular_speed
+                self.cmd_vel_pub.publish(twist_msg)
+
             rate.sleep()
 
     def on_press(self, key):

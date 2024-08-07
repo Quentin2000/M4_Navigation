@@ -1,20 +1,32 @@
 import rospy
 import tf
 import tf.msg
+import tf.transformations as tft
 import math
 import geometry_msgs.msg
+from gazebo_msgs.msg import ModelStates
 
 class DynamicTFBroadcaster:
 
     def __init__(self):
+
+        # Params
+        self.use_sim_z_pose = rospy.get_param("~use_sim_z_pose", True)  # If True (for simulation purposes), uses Gazebo elevation to compute distance to ground. Else, (for real world use), uses hip joints position to compute distance to ground.
         
         # Publisher
         self.pub_tf = rospy.Publisher("/tf", tf.msg.tfMessage, queue_size=10)
 
         # Listener
         self.listener = tf.TransformListener()
+        if self.use_sim_z_pose:
+            self.z_pose = 30.0
+            rospy.Subscriber('/gazebo/model_states', ModelStates, self.pose_callback)
 
         # Variables
+        self.rotation_x = 0
+        self.rotation_y = 0
+        self.rotation_z = 0
+        self.rotation_w = 1
         self.ref_link = "base_link"
         self.rear_right_wheel = "rear_right_wheel"
         self.rear_left_wheel = "rear_left_wheel"
@@ -67,6 +79,26 @@ class DynamicTFBroadcaster:
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
                 continue
 
+    def pose_callback(self, msg):
+        rospy.logwarn("Received ModelStates message with {} poses".format(len(msg.pose)))
+        if len(msg.pose) > 1:
+            self.z_pose = msg.pose[1].position.z
+
+            original_quaternion = (msg.pose[1].orientation.x, msg.pose[1].orientation.y, msg.pose[1].orientation.z, msg.pose[1].orientation.w)
+            
+            # Convert quaternion to Euler angles
+            euler_angles = tft.euler_from_quaternion(original_quaternion)
+
+            # Modify Euler angles: set yaw (rotation around z-axis) to 0
+            modified_euler_angles = (euler_angles[0], euler_angles[1], 0)
+
+            # Convert modified Euler angles back to quaternion
+            new_quaternion = tft.quaternion_from_euler(*modified_euler_angles)
+
+            self.rotation_x, self.rotation_y, self.rotation_z, self.rotation_w = new_quaternion
+            
+        else:
+            rospy.logwarn("ModelStates message does not contain enough models.")
 
     def compute_ground_contact_transform(self, wheel_link):
 
@@ -83,16 +115,19 @@ class DynamicTFBroadcaster:
         t.transform.translation.x = 0.0
         t.transform.translation.y = 0.0
         # Ground_link tranform computation: base_link_2_ground_contact = dist_z(base_link, center of wheel) + dist_z(center of wheel, ground) (depending on hip angle)
-        t.transform.translation.z = distance_z + self.wheel_radius_transformed * math.sin(rot_x)
-        # Set the rest of the transforms as default value since the transform is only in Z.
-        t.transform.rotation.x = 0.0
-        t.transform.rotation.y = 0.0
-        t.transform.rotation.z = 0.0
-        t.transform.rotation.w = 1.0
-
-        # If the wheel contact is higher than the robot supports, set transform to dist_z(base_link, robot_supports)
-        if t.transform.translation.z < self.m4_ground_holder_tf_z:
-            t.transform.translation.z = self.m4_ground_holder_tf_z
+        if self.use_sim_z_pose:
+            t.transform.translation.z = self.z_pose
+        else:
+            t.transform.translation.z = distance_z + self.wheel_radius_transformed * math.sin(rot_x)        
+            # If the wheel contact is higher than the robot supports, set transform to dist_z(base_link, robot_supports)
+            if t.transform.translation.z < self.m4_ground_holder_tf_z:
+                t.transform.translation.z = self.m4_ground_holder_tf_z
+        
+            # Set the rest of the transforms as default value since the transform is only in Z.
+        t.transform.rotation.x = self.rotation_x
+        t.transform.rotation.y = self.rotation_y
+        t.transform.rotation.z = self.rotation_z
+        t.transform.rotation.w = self.rotation_w
 
         return t
 

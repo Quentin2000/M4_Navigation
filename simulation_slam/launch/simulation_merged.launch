@@ -2,11 +2,14 @@
 <!-- -->
 <launch>
 
+  <arg name="rl"                        default="true"/>
+
   <!-- Load Gazebo world -->
   <include file="$(find simulation_world)/launch/gazebo_rviz.launch">
     <arg name="launch_rviz" value="false"/>
-    <arg name="world_name"  value="parkour_3.world"/>
+    <arg name="world_name"  value="parkour_4.world"/>
     <arg name="publish_static_footprint_tf" value="false"/>
+    <arg name="rl" value="$(arg rl)"/>
   </include>
 
   <!-- SLAM ARGUMENTS -->
@@ -20,11 +23,11 @@
   <arg name="proj_max_ground_angle"     default="15"/>
   <arg name="proj_max_ground_height"    default="0.1"/>
   <arg name="proj_max_height_default"   default="1.2"/>
-  <arg name="proj_max_height_rolling"   default="0.32"/>
-  <arg name="proj_max_height_crawling"  default="0.26"/>
+  <arg name="proj_max_height_rolling"   default="0.30"/>
+  <arg name="proj_max_height_crawling"  default="0.255"/>
 
   <!-- Grid parameters -->
-  <arg name="use_dual_map_msg"          default="true"/>
+  <arg name="use_dual_map_msg"          default="false"/>
   <arg name="grid_resolution"           default="$(eval arg('cloud_noise_filtering_radius')/2)"/>
   <arg name="grid_size_meters"          default="40"/>
   <arg name="cost_crawling"             default="45"/>
@@ -61,7 +64,6 @@
     <arg name="proj_max_height"                     value="$(arg proj_max_height_default)"/>
     <arg name="proj_min_cluster_size"               value="$(arg proj_min_cluster_size)"/>
   </include>
-
 
   <group if="$(arg use_dual_map_msg)">
 
@@ -110,8 +112,8 @@
     </node>
 
     <node name="single_pc_2_map_node2" pkg="simulation_slam" type="single_pc_2_map.py" output="screen">
-      <param name="input_cloud"      value="/roll_detect_cloud"/>
-      <param name="output_map"      value="roll_grid_map"/>
+      <param name="input_cloud"           value="/roll_detect_cloud"/>
+      <param name="output_map"            value="roll_grid_map"/>
       <param name="grid_resolution"      value="$(arg grid_resolution)"/>
       <param name="grid_size_meters"     value="$(arg grid_size_meters)"/>
     </node>
@@ -120,17 +122,18 @@
   <!-- Merge gridmaps -->
   <node name="cost_map_node" pkg="simulation_slam" type="cost_map_node.py" output="screen">
     <param name="input_grid_rolling"      value="/roll_grid_map"/>
-    <param name="input_grid_crawling"      value="/crawl_grid_map"/>
-    <param name="input_grid_dual" value='/dual_grid_map'/>
-    <param name="cost_rolling"      value="$(arg cost_rolling)"/>  <!-- grid_cost_1 needs to be higher than grid_cost_2 as it will be inflated -->
-    <param name="cost_crawling"      value="$(arg cost_crawling)"/>
-    <param name="output_grid"      value="/merged_occupancy_grid"/>
+    <param name="input_grid_crawling"     value="/crawl_grid_map"/>
+    <param name="use_dual_map_msg"        value="$(arg use_dual_map_msg)"/>
+    <param name="input_grid_dual"         value="/dual_grid_map"/>
+    <param name="cost_rolling"            value="$(arg cost_rolling)"/>  <!-- grid_cost_1 needs to be higher than grid_cost_2 as it will be inflated -->
+    <param name="cost_crawling"           value="$(arg cost_crawling)"/>
+    <param name="output_grid"             value="/merged_occupancy_grid"/>
   </node>
 
   <!-- Launch move_base -->
   <include file="$(find simulation_slam)/launch/navigation.launch">
-    <!-- <arg name="model" value="$(arg model)" /> -->
     <arg name="move_forward_only" value="true"/>
+    
   </include>
 
   <!-- Launch mode detection node -->
@@ -140,13 +143,13 @@
   </node>
 
   <!-- Launch navigation state estimator node for the variables "is_moving" and "is_transitioning" (between modes) -->
-  <node name="navigation_state_estimator_node" pkg="simulation_slam" type="navigation_state_estimator.py" output="screen"/>
+  <!-- <node name="navigation_state_estimator_node" pkg="simulation_slam" type="navigation_state_estimator.py" output="screen"/> -->
 
   <!-- Launch power consumption computation node -->
-  <node name="power_computation_node" pkg="simulation_slam" type="power_computation.py" output="screen">
+  <!-- <node name="power_computation_node" pkg="simulation_slam" type="power_computation.py" output="screen">
     <param name="cost_crawling"       value="$(arg cost_crawling)"/>
     <param name="cost_rolling"        value="$(arg cost_rolling)"/>
-    <param name="cost_transitioning"  value="$(arg cost_transitioning)"/>
-  </node>
+    <param name="cost_transitioning"  value="$(arg cost_transitioning)"/> -->
+  <!-- </node> -->
   
 </launch>

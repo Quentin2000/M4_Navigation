@@ -18,6 +18,7 @@ class OccupancyGridMerger:
         input_grid_crawling = rospy.get_param("~input_grid_crawling", '/crawl_grid_map')    
         # NOTE: Add your additional input_grids for new modes...
         # Dual input grid
+        self.use_dual_map_msg = rospy.get_param("~use_dual_map_msg", False)  
         self.input_grid_dual = rospy.get_param("~input_grid_dual", 'None')     
         # NOTE: Modify input_grid_dual to input_grid_N for new modes...
         # Cost within [0:100] to traverse the grid
@@ -29,14 +30,14 @@ class OccupancyGridMerger:
         self.merged_occupancy_grid_pub_inflated_topic = self.output_grid + "_inflated"
 
         # SUBSCRIBERS
-        if self.input_grid_dual == 'None':
+        if self.use_dual_map_msg:
+            rospy.Subscriber(self.input_grid_dual, DualOccupancyGrid, self.occupancy_grid_dual_callback)
+            # NOTE: Modify input_grid_dual to input_grid_N for new modes...
+        else:
             # Subscribe to the occupancy grid topics
             rospy.Subscriber(input_grid_rolling, OccupancyGrid, self.occupancy_grid_rolling_callback)
             rospy.Subscriber(input_grid_crawling, OccupancyGrid, self.occupancy_grid_crawling_callback)
             # NOTE: Add your additional subscribers for new modes...
-        else:
-            rospy.Subscriber(self.input_grid_dual, DualOccupancyGrid, self.occupancy_grid_dual_callback)
-            # NOTE: Modify input_grid_dual to input_grid_N for new modes...
 
         # PUBLISHERS
         self.merged_occupancy_grid_pub = rospy.Publisher(self.output_grid, OccupancyGrid, queue_size=10)

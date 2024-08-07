@@ -1,4 +1,6 @@
 GlobalPlanner:
   use_dijkstra: true
+  # cost_factor: 10
+  # neutral_cost: 10
   # allow_unknown: true 
 

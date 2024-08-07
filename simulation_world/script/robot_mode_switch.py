@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import rospy
 import numpy as np
@@ -55,7 +55,7 @@ class JointCommander:
                     self.target_values[joint_name] = np.linspace(self.current_positions.get(joint_name, 0.0), np.deg2rad(0), increments)
                 # CRAWLING mode 
                 elif command_value == "CRAWLING":
-                    self.target_values[joint_name] = np.linspace(self.current_positions.get(joint_name, 0.0), np.deg2rad(30.0), increments)
+                    self.target_values[joint_name] = np.linspace(self.current_positions.get(joint_name, 0.0), np.deg2rad(40.0), increments)
                 # FLIGHT mode
                 elif command_value == "FLIGHT":
                     normal_speed_increments = np.linspace(self.current_positions.get(joint_name, 0.0), np.deg2rad(90.0-20.0), increments)
