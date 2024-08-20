@@ -5,13 +5,13 @@ raytrace_range: 5.25 # used to differentiate types of obstacles and clear area (
 footprint: [[-0.35,-0.2], [0.35,-0.2],[0.35, 0.2],[-0.35, 0.2]]
 
 static:
-  map_topic: /merged_occupancy_grid_inflated
+  map_topic: /nav_grid_map_inflated # Use /merged_occupancy_grid_inflated or /nav_grid_map_inflated to have obstacle avoidance, or /empty_grid to have straight lines to goal
   subscribe_to_updates: true
   trinary_costmap: false
 
 obstacles:
   observation_sources: point_cloud
-  point_cloud: {sensor_frame: front_realsense, data_type: PointCloud2, topic: /crawl_detect_cloud, marking: true, clearing: true}
+  point_cloud: {sensor_frame: front_realsense, data_type: PointCloud2, topic: /nav_detect_cloud, marking: true, clearing: true}
 
 inflation:
   inflation_radius: 0.6

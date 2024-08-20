@@ -293,7 +293,7 @@ Visualization Manager:
       Draw Behind: false
       Enabled: true
       Name: Map
-      Topic: /merged_occupancy_grid_inflated
+      Topic: /nav_grid_map_inflated
       Unreliable: false
       Use Timestamp: false
       Value: false

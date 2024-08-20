@@ -3,13 +3,21 @@
 <launch>
 
   <arg name="rl"                        default="true"/>
+  <arg name="report"                    default="true"/>
+  <!-- <arg name="rosbag"               default="rosbag.bag"/> -->
+  <arg name="obstacle_avoidance"        default="true"/>
 
   <!-- Load Gazebo world -->
   <include file="$(find simulation_world)/launch/gazebo_rviz.launch">
     <arg name="launch_rviz" value="false"/>
-    <arg name="world_name"  value="parkour_4.world"/>
+    <arg name="world_name"  value="parkour_6.world"/>
     <arg name="publish_static_footprint_tf" value="false"/>
     <arg name="rl" value="$(arg rl)"/>
+  </include>
+
+  <!-- Launch move_base -->
+  <include file="$(find simulation_slam)/launch/navigation.launch">
+    <arg name="move_forward_only" value="true"/>
   </include>
 
   <!-- SLAM ARGUMENTS -->
@@ -25,6 +33,7 @@
   <arg name="proj_max_height_default"   default="1.2"/>
   <arg name="proj_max_height_rolling"   default="0.30"/>
   <arg name="proj_max_height_crawling"  default="0.255"/>
+  <arg name="proj_max_height_nav"       default="0.150"/>
 
   <!-- Grid parameters -->
   <arg name="use_dual_map_msg"          default="false"/>
@@ -33,7 +42,6 @@
   <arg name="cost_crawling"             default="45"/>
   <arg name="cost_rolling"              default="30"/>
   <arg name="cost_transitioning"        default="50"/>
-
 
    <!-- SLAM -->
   <include file="$(find simulation_slam)/launch/rtabmap_advanced.launch">
@@ -65,91 +73,128 @@
     <arg name="proj_min_cluster_size"               value="$(arg proj_min_cluster_size)"/>
   </include>
 
-  <group if="$(arg use_dual_map_msg)">
-
-    <!-- Launch dual gridmap nodes -->
-    <node name="dual_pc_2_map_node" pkg="simulation_slam" type="dual_pc_2_map.py" output="screen">
-      <param name="input_cloud"      value="rtabmap/cloud_obstacles"/>
-      <param name="output_map"      value="dual_grid_map"/>
-      <param name="output_map1"      value="crawl_grid_map"/>
-      <param name="output_map2"      value="roll_grid_map"/>
-      <param name="grid_resolution"      value="$(arg grid_resolution)"/>
-      <param name="grid_size_meters"     value="$(arg grid_size_meters)"/>
-      <param name="threshold_1"     value="$(arg proj_max_height_crawling)"/>
-      <param name="threshold_2"     value="$(arg proj_max_height_rolling)"/>
-    </node>
-      
-  </group>
-  <group unless="$(arg use_dual_map_msg)">
-
-    <node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen" />
-
-    <!-- Launch passthrough filter nodes at specific height -->
-    <node pkg="nodelet" type="nodelet" name="passthrough" args="load pcl/PassThrough pcl_manager" output="screen">
-      <remap from="~input" to="rtabmap/cloud_obstacles" />
-      <remap from="~output" to="crawl_detect_cloud" />
-      <param name="filter_field_name" type="str" value="z"/>
-      <param name="filter_limit_min" type="double" value="$(arg proj_max_ground_height)"/>
-      <param name="filter_limit_max" type="double" value="$(arg proj_max_height_crawling)"/>
-      <param name="filter_limit_negative" type="bool" value="false"/>
-    </node>
-
-    <node pkg="nodelet" type="nodelet" name="passthrough2" args="load pcl/PassThrough pcl_manager" output="screen">
-      <remap from="~input" to="rtabmap/cloud_obstacles" />
-      <remap from="~output" to="roll_detect_cloud" />
-      <param name="filter_field_name" type="str" value="z"/>
-      <param name="filter_limit_min" type="double" value="$(arg proj_max_ground_height)"/>
-      <param name="filter_limit_max" type="double" value="$(arg proj_max_height_rolling)"/>
-      <param name="filter_limit_negative" type="bool" value="false"/>
-    </node>
-    
-    <!-- Launch gridmap nodes -->
-    <node name="single_pc_2_map_node" pkg="simulation_slam" type="single_pc_2_map.py" output="screen">
-      <param name="input_cloud"      value="/crawl_detect_cloud"/>
-      <param name="output_map"      value="crawl_grid_map"/>
-      <param name="grid_resolution"      value="$(arg grid_resolution)"/>
-      <param name="grid_size_meters"     value="$(arg grid_size_meters)"/>
-    </node>
-
-    <node name="single_pc_2_map_node2" pkg="simulation_slam" type="single_pc_2_map.py" output="screen">
-      <param name="input_cloud"           value="/roll_detect_cloud"/>
-      <param name="output_map"            value="roll_grid_map"/>
-      <param name="grid_resolution"      value="$(arg grid_resolution)"/>
-      <param name="grid_size_meters"     value="$(arg grid_size_meters)"/>
-    </node>
+  <group unless="$(arg obstacle_avoidance)">
+    <!-- Launch empty map to be used by planner -->
+    <node name="empty_grid_pub_node" pkg="simulation_slam" type="empty_grid_pub.py" output="screen"/>
   </group>
 
-  <!-- Merge gridmaps -->
-  <node name="cost_map_node" pkg="simulation_slam" type="cost_map_node.py" output="screen">
-    <param name="input_grid_rolling"      value="/roll_grid_map"/>
-    <param name="input_grid_crawling"     value="/crawl_grid_map"/>
-    <param name="use_dual_map_msg"        value="$(arg use_dual_map_msg)"/>
-    <param name="input_grid_dual"         value="/dual_grid_map"/>
-    <param name="cost_rolling"            value="$(arg cost_rolling)"/>  <!-- grid_cost_1 needs to be higher than grid_cost_2 as it will be inflated -->
-    <param name="cost_crawling"           value="$(arg cost_crawling)"/>
-    <param name="output_grid"             value="/merged_occupancy_grid"/>
+  <node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen" />
+
+  <!-- Create nav obstacles cloud -->
+  <node pkg="nodelet" type="nodelet" name="passthrough" args="load pcl/PassThrough pcl_manager" output="screen">
+    <remap from="~input" to="rtabmap/cloud_obstacles" />
+    <remap from="~output" to="nav_detect_cloud" />
+    <param name="filter_field_name" type="str" value="z"/>
+    <param name="filter_limit_min" type="double" value="$(arg proj_max_ground_height)"/>
+    <param name="filter_limit_max" type="double" value="$(arg proj_max_height_nav)"/>
+    <param name="filter_limit_negative" type="bool" value="false"/>
   </node>
 
-  <!-- Launch move_base -->
-  <include file="$(find simulation_slam)/launch/navigation.launch">
-    <arg name="move_forward_only" value="true"/>
-    
-  </include>
-
-  <!-- Launch mode detection node -->
-  <node name="mode_detect_node" pkg="simulation_slam" type="mode_detect_node.py" output="screen">
-    <param name="cost_crawling"     value="$(arg cost_crawling)"/>
-    <param name="cost_rolling"      value="$(arg cost_rolling)"/>
+  <!-- Create nav gridmap -->
+  <node name="single_pc_2_map_node" pkg="simulation_slam" type="single_pc_2_map.py" output="screen">
+    <param name="input_cloud"           value="/nav_detect_cloud"/>
+    <param name="output_map"            value="nav_grid_map"/>
+    <param name="grid_resolution"      value="$(arg grid_resolution)"/>
+    <param name="grid_size_meters"     value="$(arg grid_size_meters)"/>
   </node>
 
-  <!-- Launch navigation state estimator node for the variables "is_moving" and "is_transitioning" (between modes) -->
-  <!-- <node name="navigation_state_estimator_node" pkg="simulation_slam" type="navigation_state_estimator.py" output="screen"/> -->
+  <!-- Inflate nav gridmap -->
+  <node name="inflate_grid" pkg="simulation_slam" type="inflate_grid.py" output="screen">
+    <param name="input_grid"              value="/nav_grid_map"/>
+    <param name="output_grid"             value="/nav_grid_map_inflated"/>
+  </node>
 
-  <!-- Launch power consumption computation node -->
-  <!-- <node name="power_computation_node" pkg="simulation_slam" type="power_computation.py" output="screen">
-    <param name="cost_crawling"       value="$(arg cost_crawling)"/>
-    <param name="cost_rolling"        value="$(arg cost_rolling)"/>
-    <param name="cost_transitioning"  value="$(arg cost_transitioning)"/> -->
-  <!-- </node> -->
+  <group unless="$(arg rl)">
   
+    <group if="$(arg use_dual_map_msg)">
+    
+      <!-- Launch dual gridmap nodes -->
+      <node name="dual_pc_2_map_node" pkg="simulation_slam" type="dual_pc_2_map.py" output="screen">
+        <param name="input_cloud"      value="rtabmap/cloud_obstacles"/>
+        <param name="output_map"      value="dual_grid_map"/>
+        <param name="output_map1"      value="crawl_grid_map"/>
+        <param name="output_map2"      value="roll_grid_map"/>
+        <param name="grid_resolution"      value="$(arg grid_resolution)"/>
+        <param name="grid_size_meters"     value="$(arg grid_size_meters)"/>
+        <param name="threshold_1"     value="$(arg proj_max_height_crawling)"/>
+        <param name="threshold_2"     value="$(arg proj_max_height_rolling)"/>
+      </node>
+    
+    </group>
+
+    <group unless="$(arg use_dual_map_msg)">
+
+      <!-- Launch passthrough filter nodes at specific height -->
+      <node pkg="nodelet" type="nodelet" name="passthrough1" args="load pcl/PassThrough pcl_manager" output="screen">
+        <remap from="~input" to="rtabmap/cloud_obstacles" />
+        <remap from="~output" to="crawl_detect_cloud" />
+        <param name="filter_field_name" type="str" value="z"/>
+        <param name="filter_limit_min" type="double" value="$(arg proj_max_ground_height)"/>
+        <param name="filter_limit_max" type="double" value="$(arg proj_max_height_crawling)"/>
+        <param name="filter_limit_negative" type="bool" value="false"/>
+      </node>
+
+      <node pkg="nodelet" type="nodelet" name="passthrough2" args="load pcl/PassThrough pcl_manager" output="screen">
+        <remap from="~input" to="rtabmap/cloud_obstacles" />
+        <remap from="~output" to="roll_detect_cloud" />
+        <param name="filter_field_name" type="str" value="z"/>
+        <param name="filter_limit_min" type="double" value="$(arg proj_max_ground_height)"/>
+        <param name="filter_limit_max" type="double" value="$(arg proj_max_height_rolling)"/>
+        <param name="filter_limit_negative" type="bool" value="false"/>
+      </node>
+      
+      <!-- Launch gridmap nodes -->
+      <node name="single_pc_2_map_node1" pkg="simulation_slam" type="single_pc_2_map.py" output="screen">
+        <param name="input_cloud"      value="/crawl_detect_cloud"/>
+        <param name="output_map"      value="crawl_grid_map"/>
+        <param name="grid_resolution"      value="$(arg grid_resolution)"/>
+        <param name="grid_size_meters"     value="$(arg grid_size_meters)"/>
+      </node>
+
+      <node name="single_pc_2_map_node2" pkg="simulation_slam" type="single_pc_2_map.py" output="screen">
+        <param name="input_cloud"           value="/roll_detect_cloud"/>
+        <param name="output_map"            value="roll_grid_map"/>
+        <param name="grid_resolution"      value="$(arg grid_resolution)"/>
+        <param name="grid_size_meters"     value="$(arg grid_size_meters)"/>
+      </node>
+    
+    </group>
+
+    <!-- Merge gridmaps -->
+    <node name="cost_map_node" pkg="simulation_slam" type="cost_map_node.py" output="screen">
+      <param name="input_grid_rolling"      value="/roll_grid_map"/>
+      <param name="input_grid_crawling"     value="/crawl_grid_map"/>
+      <param name="use_dual_map_msg"        value="$(arg use_dual_map_msg)"/>
+      <param name="input_grid_dual"         value="/dual_grid_map"/>
+      <param name="cost_rolling"            value="$(arg cost_rolling)"/>  <!-- grid_cost_1 needs to be higher than grid_cost_2 as it will be inflated -->
+      <param name="cost_crawling"           value="$(arg cost_crawling)"/>
+      <param name="output_grid"             value="/merged_occupancy_grid"/>
+    </node>
+
+    <!-- Launch mode detection node -->
+    <node name="mode_detect_node" pkg="simulation_slam" type="mode_detect_node.py" output="screen">
+      <param name="cost_crawling"     value="$(arg cost_crawling)"/>
+      <param name="cost_rolling"      value="$(arg cost_rolling)"/>
+    </node>
+
+  </group>
+
+  <group if="$(arg report)">
+
+    <!-- Launch goal status node -->
+    <node name="goal_status_pub" pkg="simulation_slam" type="goal_status_pub.py" output="screen"/>
+
+    <!-- Launch goal publisher node -->
+    <node name="goal_pub" pkg="simulation_slam" type="goal_pub.py" output="screen"/>
+
+    <!-- Launch rosbag node for report graphs. CAREFUL: IT KILLS THE ROS PROCESS WHEN REACHING AN OBSTACLES, COMMENT IT IF NOT FOR REPORT PURPOSES! -->
+    <!-- <node name="rosbag_controller" pkg="simulation_slam" type="rosbag_controller.py" output="screen">
+        <param name="rosbag"     value="$(arg rosbag)"/>
+    </node> -->
+
+    <!-- Launch power computation node -->
+    <node name="power_computation_node" pkg="simulation_slam" type="power_computation.py" output="screen"/>
+  
+  </group>
+
 </launch>

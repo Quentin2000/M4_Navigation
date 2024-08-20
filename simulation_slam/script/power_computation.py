@@ -1,125 +1,95 @@
 #!/usr/bin/env python3
 
 import rospy
-from std_msgs.msg import String, Float32
+from nav_msgs.msg import Odometry
+from sensor_msgs.msg import JointState
+from std_msgs.msg import Float32
 from simulation_slam.msg import NavigationState
-
+import math
 
 class PowerComputationNode:
     def __init__(self):
         rospy.init_node('power_computation_node')
 
-        # Parameters
-        self.cost_crawling = rospy.get_param('~cost_crawling', 45)
-        self.cost_rolling = rospy.get_param('~cost_rolling', 30)
-        self.cost_transitioning = rospy.get_param('~cost_transitioning', 50)
+        # Power consumption parameters
+        self.wheel_power_min = rospy.get_param('~wheel_power_min', 0.25*12)     # Power at 0 m/s (see 25D 9.7:1 motor specs)
+        self.wheel_power_max = rospy.get_param('~wheel_power_max', 10)          # Power at 1 m/s
+        self.hip_power_min = rospy.get_param('~hip_power_min', 20)              # Power at 0 rad (see XXXXX motor specs)
+        self.hip_power_max = rospy.get_param('~hip_power_max', 35)              # Power at 1 rad
 
         # Subscribers
-        rospy.Subscriber('/m4assembly/mode/command', String, self.mode_command_callback)
-        rospy.Subscriber('/nav_state', NavigationState, self.navigation_state_callback)
+        rospy.Subscriber('/rtabmap/odom', Odometry, self.odom_callback)
+        rospy.Subscriber('/m4assembly/joint_states', JointState, self.joint_states_callback)
 
         # Publishers
-        self.pub_cost_rolling = rospy.Publisher('/computed_cost_rolling', Float32, queue_size=10)
-        self.pub_cost_crawling = rospy.Publisher('/computed_cost_crawling', Float32, queue_size=10)
-        self.pub_cost_transitioning = rospy.Publisher('/computed_cost_transitioning', Float32, queue_size=10)
-        self.pub_cost_total = rospy.Publisher('/computed_cost_total', Float32, queue_size=10)
-        self.pub_elapsed_time = rospy.Publisher('/elapsed_time', Float32, queue_size=10)
+        self.pub_nav_state = rospy.Publisher('/nav_state', NavigationState, queue_size=10)
+        self.pub_total_power_consumption = rospy.Publisher('/power_consumption_total', Float32, queue_size=10)
+        self.pub_hip_power_consumption = rospy.Publisher('/power_consumption_hip', Float32, queue_size=10)
+        self.pub_wheel_power_consumption = rospy.Publisher('/power_consumption_wheel', Float32, queue_size=10)
 
         # Variables
-        self.current_mode = None                           # "CRAWLING", "ROLLING", "FLIGHT"
-        self.prev_mode = None                              # "CRAWLING", "ROLLING", "FLIGHT"
+        self.joint_names = ['rear_left_hip', 'rear_right_hip', 'front_left_hip', 'front_right_hip']
+        self.hip_angles = {}
+        self.linear_speed = None
+        self.angular_speed = None
         self.is_moving = False
-        self.is_transitioning = False
-        self.prev_is_transitioning = False
-        self.last_transitioning_time = rospy.Time.now()
-        self.start_time = rospy.Time.now()
-        self.last_time = self.start_time
-        self.computed_cost_rolling = 0.0                    # Energy [J]
-        self.computed_cost_crawling = 0.0                   # Energy [J]
-        self.computed_cost_transitioning = 0.0              # Energy [J]
+        self.total_power = 0.0
+        self.hip_power_total = 0.0
+        self.wheel_power_total = 0.0
 
-    def mode_command_callback(self, msg):
-        self.current_mode = msg.data
+    def joint_states_callback(self, msg):
+        for i, joint_name in enumerate(msg.name):
+            joint_name_cut = joint_name.split('_joint')[0]
+            if joint_name_cut in self.joint_names:
+                self.hip_angles[joint_name_cut] = msg.position[i]
+        self.calculate_and_publish_power()
 
-    def navigation_state_callback(self, msg):
-        self.is_moving = msg.moving
-        self.is_transitioning = msg.transitioning 
+    def odom_callback(self, msg):
+        self.linear_speed = msg.twist.twist.linear
+        self.angular_speed = msg.twist.twist.angular
+        self.evaluate_motion_state()
 
-    def compute_costs(self):
+    def evaluate_motion_state(self):
+        if self.linear_speed and self.angular_speed:
+            self.is_moving = math.hypot(self.linear_speed.x, self.linear_speed.y) > 0.01
+            self.publish_navigation_state()
+
+    def publish_navigation_state(self):
+        nav_state = NavigationState()
+        nav_state.moving = self.is_moving
+        self.pub_nav_state.publish(nav_state)
+
+    def calculate_and_publish_power(self):
+        # Calculate power based on hip angles
+        hip_power = 0.0
+        for angle in self.hip_angles.values():
+            power = self.hip_power_min + (self.hip_power_max - self.hip_power_min) * (abs(angle) / math.pi)
+            hip_power += power
         
-        # Wait for current_mode to become available
-        if self.current_mode is not None:
-            
-            # Wait for robot to move to compute energy consumption (driving motors)
-            if self.is_moving:
-                
-                # Restart timer if mode has changed [sec]
-                if (self.current_mode != self.prev_mode):
-                    self.last_time = rospy.Time.now()
-                    self.prev_mode = self.current_mode
+        # Update total hip power
+        self.hip_power_total += hip_power
 
-                # Get current time [sec]
-                current_time = rospy.Time.now()
-
-                # Compute time since last mode change
-                elapsed_time = (current_time - self.last_time).to_sec()
-
-                # Update last moving time
-                self.last_time = rospy.Time.now()
-                
-                # Pulish elapsed time for debug purposes
-                self.pub_elapsed_time.publish(elapsed_time)
-
-                # Compute and publish energy comsumption per mode: E [J] = P [W] * dT [sec]
-                if self.current_mode == "ROLLING":
-                    self.computed_cost_rolling = self.computed_cost_rolling + self.cost_rolling * elapsed_time
-                elif self.current_mode == "CRAWLING":
-                    self.computed_cost_crawling = self.computed_cost_crawling + self.cost_crawling * elapsed_time
-           
-            else:
-                # Restart timer until the robot starts moving again to avoid integrating energy when robot is idle 
-                self.last_time = rospy.Time.now()
-            
-            # Compute mode transition power consumption (hip servo motors)
-            if self.is_transitioning:
-            
-                # Restart timer if just started transitioning [sec]
-                if (self.prev_is_transitioning == False):
-                    self.last_transitioning_time = rospy.Time.now()
-                    self.prev_is_transitioning = True
-                
-                # Get current time [sec]
-                current_time = rospy.Time.now()
-
-                # Compute time since start of transition [sec]
-                elapsed_time = (current_time - self.last_transitioning_time).to_sec()
-                
-                # Update last transition time
-                self.last_transitioning_time = rospy.Time.now()
-
-                # Compute and publish energy comsumption for transitioning: E [J] = P [W] * dT [sec]
-                self.computed_cost_transitioning = self.computed_cost_transitioning + self.cost_transitioning * elapsed_time
-
-            else:
-                # If stopped transitioning, reset the transition state to restart the last_transitioning_time timer
-                self.prev_is_transitioning = False
+        # Calculate power based on wheel speed
+        wheel_power = 0.0
+        if self.is_moving:
+            wheel_speed = math.hypot(self.linear_speed.x, self.linear_speed.y)
+            wheel_power = self.wheel_power_min + (self.wheel_power_max - self.wheel_power_min) * wheel_speed * 4    # For 4 wheels
         
-        # Publish separate energy consumptions in [J]
-        self.pub_cost_rolling.publish(self.computed_cost_rolling)
-        self.pub_cost_crawling.publish(self.computed_cost_crawling)
-        self.pub_cost_transitioning.publish(self.computed_cost_transitioning)
+        # Update total wheel power
+        self.wheel_power_total += wheel_power
 
-        # Compute the total energy consumption in [J]
-        total_cost = self.computed_cost_rolling + self.computed_cost_crawling + self.computed_cost_transitioning
-        rospy.loginfo("Power consumption: %f", total_cost)
-        self.pub_cost_total.publish(total_cost)
+        # Update total power
+        self.total_power = self.hip_power_total + self.wheel_power_total
+
+        # Publish power consumption
+        self.pub_hip_power_consumption.publish(Float32(self.hip_power_total))
+        self.pub_wheel_power_consumption.publish(Float32(self.wheel_power_total))
+        self.pub_total_power_consumption.publish(Float32(self.total_power))
 
     def run(self):
-        rate = rospy.Rate(100)
+        rate = rospy.Rate(10)  # 10 Hz
         while not rospy.is_shutdown():
-            self.compute_costs()
             rate.sleep()
-
 
 if __name__ == '__main__':
     try:

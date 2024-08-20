@@ -1166,7 +1166,7 @@
     </plugin>
   </gazebo>
 
-<!-- ROS Control plugin for Gazebo -->
+  <!-- ROS Control plugin for Gazebo -->
   <gazebo>
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
       <robotNamespace>/m4assembly</robotNamespace>
@@ -1178,6 +1178,23 @@
       <update_rate>20</update_rate>
       <joint_name>front_right_wheel_joint</joint_name>
     </plugin>
+  </gazebo>
+
+  <!-- ROS Contact sensor plugin for Gazebo -->
+  <gazebo reference="base_link">
+    <sensor type="contact" name="base_link_contact_sensor">
+        <always_on>1</always_on>
+        <update_rate>10</update_rate>
+        <contact>
+            <collision>base_link_collision</collision>
+        </contact>
+        <plugin name="contact_plugin" filename="libgazebo_ros_bumper.so">
+            <alwaysOn>true</alwaysOn>
+            <updateRate>10</updateRate>
+            <topicName>/base_link/contact</topicName>
+            <frameName>base_link</frameName>
+        </plugin>
+    </sensor>
   </gazebo>
 
   <!-- transmission -->

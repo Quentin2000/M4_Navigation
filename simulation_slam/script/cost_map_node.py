@@ -47,7 +47,7 @@ class OccupancyGridMerger:
         self.occupancy_grid_crawling = None
         self.occupancy_grid_rolling = None
         # Set the rate at which the merging operation is performed (2Hz)
-        self.rate = rospy.Rate(2)
+        self.rate = rospy.Rate(5)
 
     def occupancy_grid_dual_callback(self, msg):
         # Store the received occupancy grid data

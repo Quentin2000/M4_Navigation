@@ -11,7 +11,7 @@
   
   <!-- launch gazebo simulation with a defined world  -->
   <arg name="gui" default="true"/>
-  <arg name="world_name" default="parkour_4.world"/>
+  <arg name="world_name" default="parkour_6.world"/>
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" value="$(find simulation_world)/worlds/$(arg world_name)"/>
     <arg name="gui" value="$(arg gui)"/>
@@ -53,10 +53,13 @@
   <!-- launch keyboard controller -->
   <node name="key_controller_node" pkg="simulation_world" type="key_controller.py" output="screen"/>
 
+  <!-- launch contact counter node -->
+  <node name="contact_node" pkg="simulation_world" type="contact_node.py" output="screen"/>
+
   <arg name="rl" default="true"/>
   <!-- launch robot elevation control nodes (via hip position control)-->
   <group if="$(arg rl)">
-    <node name="rl_controller" pkg="simulation_slam" type="rl_controller.py" output="screen"/>
+    <node name="rl_controller" pkg="simulation_world" type="rl_controller.py" output="screen"/>
     <node name="robot_mode_switch_rl" pkg="simulation_world" type="robot_mode_switch_rl.py" output="screen"/>
   </group>
   <group unless="$(arg rl)">
@@ -94,6 +97,6 @@
       type="rviz"
       args="-d $(find simulation_world)/rviz/m4_visual_2.rviz" />
   </group>
-     
+
 </launch>
 

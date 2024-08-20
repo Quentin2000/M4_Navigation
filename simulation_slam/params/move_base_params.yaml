@@ -1,6 +1,6 @@
 controller_frequency: 10.0 
 controller_patience: 15.0
-planner_frequency: 1.0 # 0 is upon new goal or path blocked
+planner_frequency: 5.0 # 0 is upon new goal or path blocked
 planner_patience: 5.0
 max_planning_retries: 20
 

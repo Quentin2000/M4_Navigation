@@ -18,8 +18,6 @@ from cv_bridge import CvBridge, CvBridgeError
 class DualCameraResnetModel(nn.Module):
     def __init__(self, output_dim):
         super(DualCameraResnetModel, self).__init__()
-        
-        rospy.logwarn("Test")
 
         # Load a pre-trained ResNet-18 model for both cameras
         self.resnet18_cam1 = models.resnet18(pretrained=True)
@@ -213,7 +211,7 @@ class ModelInferenceNode:
                 front_command = front_command * 0.7
                 rear_command = rear_command * 0.7
                 
-                max_sigma = 1.0
+                max_sigma = 1.0 
                 if (sigma[0,0] < max_sigma or sigma[0,1] < max_sigma): 
                     self.hip_pos_msg.FL_hip = front_command
                     self.hip_pos_msg.FR_hip = front_command

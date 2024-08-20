@@ -80,7 +80,6 @@ class DynamicTFBroadcaster:
                 continue
 
     def pose_callback(self, msg):
-        rospy.logwarn("Received ModelStates message with {} poses".format(len(msg.pose)))
         if len(msg.pose) > 1:
             self.z_pose = msg.pose[1].position.z
 

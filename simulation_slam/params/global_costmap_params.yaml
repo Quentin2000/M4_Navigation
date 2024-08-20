@@ -2,13 +2,12 @@ global_costmap:
   global_frame: map
   robot_base_frame: base_footprint #base_link? observed drift
 
-  update_frequency: 5.0
-  publish_frequency: 5.0
+  update_frequency: 1.0
+  publish_frequency: 1.0
   transform_tolerance: 0.5
 
   rolling_window: false
   track_unknown_space: false 
-
 
   plugins:
     - {name: static,                  type: "costmap_2d::StaticLayer"}
